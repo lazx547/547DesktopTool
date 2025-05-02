@@ -23,6 +23,11 @@ Window{
     property int thisnum
 
 
+    function load(a,b){
+        file.read2(a)
+        mstg_window.read(b)
+    }
+
     Timer{//初始化计时器
         id:timer_set
         interval: 10
@@ -690,11 +695,11 @@ Window{
                             }
                         }
                         function save(){
-                            file.source="./mstg.ini"
+                            file.source=path+"/mstg.ini"
                             file.write(delT.value+","+h_type_t.text+","+h_type.checked+","+show_type_ss.checked+","+show_type_zzz.checked+","+auto_save.checked+",")
                         }
-                        function read(){
-                            file.source="./mstg.ini"
+                        function read(a=path+"/mstg.ini"){
+                            file.source=a
                             var s=file.read()
                             delT.setValue(s.slice(0,s.indexOf(",")))
                             s=s.slice(s.indexOf(",")+1,s.length)

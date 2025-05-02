@@ -1,2 +1,5 @@
 /build
 *.user
+547DesktopTool _.pro
+/.qtc_clangd
+/debug

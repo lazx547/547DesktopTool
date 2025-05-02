@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QStandardPaths>
+#include <QCoreApplication>
 GFile::GFile(QObject *parent) :
     QObject(parent)
 {
@@ -46,8 +47,10 @@ bool GFile::is(const QString &source)
 
 void GFile::create(const QString &source)
 {
-    QDir qDir=source;
-    qDir.mkdir(source);
+    QString source_=QCoreApplication::applicationDirPath()+source.sliced(1,source.indexOf("\\"))+"/";
+    QDir qDir=source_;
+    qDebug()<<qDir;
+    qDebug()<<qDir.mkpath(source);
 }
 
 QString GFile::getUser()

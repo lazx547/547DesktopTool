@@ -29,7 +29,11 @@ ApplicationWindow {
     property string path
     property int thisnum
 
-    onCclassChanged: {
+    onCclassChanged:
+    {
+        reEnable()
+    }
+    function reEnable(){
         if(num_xh[cclass]==-1)
         {
             mesenge2.show("已选择\""+clas_name[cclass]+"\""+",没有学号",3000)
@@ -47,6 +51,84 @@ ApplicationWindow {
         }
     }
 
+
+    onPathChanged: {
+        load()
+    }
+    onThisnumChanged:
+        title="547抽号器("+thisnum+")"
+    function load(){
+        file.source=path+"/source/.ini"
+        if(file.is(path+"/source/.ini"))
+        {
+            file.source=path+"./source/.ini"
+            var s=file.read()
+            var i=0,l=s.length,j=0,k,p
+            do
+            {
+                p=s.slice(0,s.indexOf(","))
+                clas.push(p)
+                i=s.indexOf(",")+1
+                s=s.slice(i,l)
+            }
+            while(i!=0)
+            clas.pop()
+            for(k=0;k<clas.length;k++)
+            {
+                file.source=path+"/source/"+clas[k]+".ini"
+                s=file.read()
+                clas_name.push(s.slice(0,s.indexOf(",")))
+                i=s.indexOf(",")+1
+                s=s.slice(i,s.length)
+                num_xh.push(s.slice(0,s.indexOf(",")))
+                i=s.indexOf(",")+1
+                s=s.slice(i,s.length)
+                a.push([])
+                do
+                {
+                    try{
+                        a[k].push(s.slice(0,s.indexOf(",")))
+                    }
+                    catch(TypeError){
+                        p=1
+                        break
+                    }
+                    i=s.indexOf(",")+1
+                    s=s.slice(i,s.length)
+                }
+                while(s.indexOf(",")!=-1)
+                clas_objs.push(obj.createObject(clasItem))
+                clas_objs[k].name=clas_name[k]
+                clas_objs[k].per=window
+                clas_objs[k].num=a[k].length
+                clas_objs[k].y=k*41
+                clas_objs[k].n=k
+                clasItem_sv.contentHeight=82*(k+1)
+            }
+            mesenge.show("已找到"+k+"个班级"+",已选择\""+clas_name[cclass]+"\"",3000)
+            reEnable()
+        }
+        else
+        {
+            mesenge.show("未找到文件",3000)
+            c1.enabled=false
+            cn.enabled=false
+        }
+    }
+
+    function cou(){
+        var a=coul()
+        if(xh.checked)
+            a=a.slice(0,num_xh[cclass])
+        else if(mz.checked)
+            a=a.slice(num_xh[cclass],a.length)
+        return a
+    }
+
+    function coul(){
+        var b=Math.floor(Math.random() * a[cclass].length)
+        return a[cclass][b]
+    }
     Window {
         id: win_s
         flags: Qt.FramelessWindowHint|Qt.Window
@@ -176,83 +258,6 @@ ApplicationWindow {
         }
     }
 
-    onPathChanged: {
-        load()
-    }
-    onThisnumChanged:
-        title="547抽号器("+thisnum+")"
-    function load(){
-        file.source=path+"/source/.ini"
-        if(file.is(path+"/source/.ini"))
-        {
-            file.source=path+"./source/.ini"
-            var s=file.read()
-            var i=0,l=s.length,j=0,k,p
-            do
-            {
-                p=s.slice(0,s.indexOf(","))
-                clas.push(p)
-                i=s.indexOf(",")+1
-                s=s.slice(i,l)
-            }
-            while(i!=0)
-            clas.pop()
-            for(k=0;k<clas.length;k++)
-            {
-                file.source=path+"/source/"+clas[k]+".ini"
-                s=file.read()
-                clas_name.push(s.slice(0,s.indexOf(",")))
-                i=s.indexOf(",")+1
-                s=s.slice(i,s.length)
-                num_xh.push(s.slice(0,s.indexOf(",")))
-                i=s.indexOf(",")+1
-                s=s.slice(i,s.length)
-                a.push([])
-                do
-                {
-                    try{
-                        a[k].push(s.slice(0,s.indexOf(",")))
-                    }
-                    catch(TypeError){
-                        p=1
-                        break
-                    }
-                    i=s.indexOf(",")+1
-                    s=s.slice(i,s.length)
-                }
-                while(s.indexOf(",")!=-1)
-                console.log(a[k].length)
-                clas_objs.push(obj.createObject(clasItem))
-                clas_objs[k].name=clas_name[k]
-                clas_objs[k].per=window
-                clas_objs[k].num=a[k].length
-                clas_objs[k].y=k*41
-                clas_objs[k].n=k
-                clasItem_sv.contentHeight=82*(k+1)
-            }
-            mesenge.show("已找到"+k+"个班级",3000)
-        }
-        else
-        {
-            mesenge.show("未找到文件",3000)
-            c1.enabled=false
-            cn.enabled=false
-        }
-    }
-
-    function cou(){
-        var a=coul()
-        if(xh.checked)
-            a=a.slice(0,num_xh[cclass])
-        else if(mz.checked)
-            a=a.slice(num_xh[cclass],a.length)
-        return a
-    }
-
-    function coul(){
-        var b=Math.floor(Math.random() * a[cclass].length)
-        return a[cclass][b]
-    }
     Rectangle{
         anchors.fill: parent
         border.color: "#80808080"
