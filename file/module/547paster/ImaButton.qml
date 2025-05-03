@@ -12,6 +12,7 @@ Button {
     property string img:""
     property bool danger:false
     property string toolTipText
+
     property color color_:"#80808080"
     width:20
     height:20
@@ -20,6 +21,7 @@ Button {
     bottomPadding: 0
     contentItem: Rectangle{
         scale: 0.5
+        color:"#00123456"
         Image {
             id:img_
             anchors.centerIn:parent
@@ -49,6 +51,7 @@ Button {
             height: realHeight
             anchors.centerIn: parent
             radius:control.radiusBg
+            color:"#00123456"
             border.width: 1
             border.color: control.enabled ? control.colorBorder : "transparent"
 
@@ -60,20 +63,6 @@ Button {
     Accessible.name: control.text
     Accessible.description: contentDescription
     Accessible.onPressAction: control.clicked();
-    ToolTip{
-        id:tt
-        background: Rectangle{
-            color: "white"
-            anchors.fill: parent
-            border.color: "black"
-        }
-        delay: 1000
-        timeout: 10000
-        contentItem: Text{
-            text: toolTipText
-            font.pixelSize: 12
-        }
-    }
 }
 
 

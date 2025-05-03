@@ -7,12 +7,12 @@ Button {
     property int radiusBg: 0
     property color colorText: {
         if (enabled)
-            return control.down ? "#1677ff" : control.hovered ? "#4096ff" : color_
+            return control.down ? "#1677ff" : control.hovered ? "#4096ff" : Qt.rgba(color_.r,color_.g,color_.b)
         else return Qt.rgba(0,0,0,0.45);
     }
     property color colorBg: {
         if (enabled)
-                return control.down ? "#ffffff" : control.hovered ? "#ffffff" : "#00ffffff";
+                return control.down ? "#00ffffff" : control.hovered ? "#00ffffff" : "#00ffffff";
         else return Qt.rgba(0,0,0,0.45);
     }
     property color colorBorder: {

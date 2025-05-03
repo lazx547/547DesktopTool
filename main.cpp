@@ -4,6 +4,7 @@
 #include <QQmlApplicationEngine>
 #include <gfile.h>
 #include "erwindow.h"
+#include "clipboardhandler.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,17 +14,20 @@ int main(int argc, char *argv[])
     file.setSource("./scale.txt");
     QString s=file.read();
     qputenv("QT_SCALE_FACTOR",s.toLatin1());
-    file.setSource("./run.ini");
-    s=file.read();
     QUrl url(QStringLiteral("./file/main.qml"));
-    if(s=="fullscreen"){
-        url=QStringLiteral("./file/main_full.qml");
-    }
 
     QGuiApplication app(argc, argv);
     QApplication* app2=new QApplication(argc, argv);
     ErWindow w;
     qmlRegisterType<GFile>("GFile",1,2,"GFile");
+    qmlRegisterSingletonType<ClipboardHandler>(
+        "Clipboard", 1, 0, "Clipboard",
+        [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+            Q_UNUSED(engine)
+            Q_UNUSED(scriptEngine)
+            return new ClipboardHandler();
+        }
+        );
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,&app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)

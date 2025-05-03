@@ -155,7 +155,7 @@ Window {
                     padding: 0
                     topPadding: 5
                     onClicked: {
-                        win_s.visible=true
+                        //win_s.visible=true
 
                     }
                 }

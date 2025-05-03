@@ -10,6 +10,7 @@ Item {
     property double lelen:23456789
     property string path:"1234567890-"
     property var objectItem:Qt.createComponent("./ObjectItem.qml")
+    property bool oneTime
 
     onPathChanged: {
         $file.source="./file/"+$ModuleErs[num].path.slice(2,$ModuleErs[num].path.length)+"/.info"
@@ -18,8 +19,26 @@ Item {
         s=s.slice(s.indexOf(",")+1,s.length)
         title.text+=" "+s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
+        des.text="描述:"+s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
-        s=s.slice(0,s.indexOf(","))=="true"?true:false
+        author.text="作者:"+s.slice(0,s.indexOf(","))
+        s=s.slice(s.indexOf(",")+1,s.length)
+        open.enabled=s.slice(0,s.indexOf(","))=="true"?true:false
+        close.enabled=open.enabled
+        s=s.slice(s.indexOf(",")+1,s.length)
+        oneTime=s.slice(0,s.indexOf(","))=="true"?true:false
+    }
+
+    onOneTimeChanged: {
+        if(oneTime)
+        {
+            close.text="关闭"
+            close.width=60
+            bus.y=70
+            moduleErItem_sv.y=100
+            moduleErItem_sv.height-=20
+            one.visible=true
+        }
     }
 
     Text{
@@ -27,12 +46,27 @@ Item {
         y:5
         font.pixelSize: 20
     }
+    Text{
+        id:author
+        y:28
+    }
+    Text{
+        id:one
+        y:52
+        visible: false
+        text:"只允许运行一个实例"
+    }
 
+    Text{
+        id:des
+        y:40
+    }
     Rectangle{
+        id:bus
         width: 323-lelen
         height: 30
         border.color: "#808080"
-        y:30
+        y:60
         border.width: 1
         Cbutton{
             id:open
@@ -40,29 +74,27 @@ Item {
             width:60
             height: 30
             onClicked: {
-                createnew(num)
+                createnew()
+                if(oneTime)
+                    enabled=false
             }
         }
         Cbutton{
+            id:close
             text: "全部关闭"
             width: 100
             x:140
             height: 30
             onClicked: {
-                for(var i=0;i<objs.length;i++)
-                {
-                    objs[i].destroy()
-                    objectItems[i].destroy()
-                }
-                objs=[]
-                objectItems=[]
+                delAll()
             }
         }
 
     }
 
-    function createnew(n)
+    function createnew(k=-1)
     {
+        var n=num
         objs.push($modules[n].createObject())
         var a=objs.length-1,b=10000*Math.random()
         objs[a].thisn=a
@@ -78,6 +110,14 @@ Item {
         objectItems[a].y=31*a
         objectItems[a].visible=true
         moduleErItem_sv.contentHeight=62*a+62
+        return b
+    }
+
+    function close(n){
+        for(var i=0;i<objs.length;i++)
+            if(objs[i].thisnum==n)
+                break
+        del(i)
     }
 
     function del(n){
@@ -96,14 +136,28 @@ Item {
             objectItems[i].y-=31
         }
         objectItems.pop()
+        if(oneTime)
+            open.enabled=true
+    }
+
+    function delAll(){
+        for(var i=0;i<objs.length;i++)
+        {
+            objs[i].destroy()
+            objectItems[i].destroy()
+        }
+        objs=[]
+        objectItems=[]
+        if(oneTime)
+            open.enabled=true
     }
 
     ScrollView{
         id:moduleErItem_sv
         transformOrigin: Item.TopLeft
         width: (323-lelen)*2
-        height: 620
-        y:60
+        height: 560
+        y:90
         scale:0.5
         ScrollBar.vertical.policy: ScrollBar.AlwaysOn
         Rectangle{

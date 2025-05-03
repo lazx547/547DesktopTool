@@ -15,8 +15,6 @@ Rectangle{
         s=s.slice(s.indexOf(",")+1,s.length)
         description.text=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
-        author.text="作者:"+s.slice(0,s.indexOf(","))
-        s=s.slice(s.indexOf(",")+1,s.length)
     }
 
     width: 330
@@ -42,13 +40,6 @@ Rectangle{
             id:title
             y:5
             font.pixelSize: 20
-        }
-        Text{
-            id:author
-            x:170
-            y:35
-            font.pixelSize: 12
-            color: "#686868"
         }
         Text{
             id:description
