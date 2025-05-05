@@ -11,6 +11,8 @@ Item {
     property string path:"1234567890-"
     property var objectItem:Qt.createComponent("./ObjectItem.qml")
     property bool oneTime
+    property bool hideOnCreate:false
+    property var per
 
     onPathChanged: {
         $file.source="./file/"+$ModuleErs[num].path.slice(2,$ModuleErs[num].path.length)+"/.info"
@@ -27,6 +29,8 @@ Item {
         close.enabled=open.enabled
         s=s.slice(s.indexOf(",")+1,s.length)
         oneTime=s.slice(0,s.indexOf(","))=="true"?true:false
+        s=s.slice(s.indexOf(",")+1,s.length)
+        hideOnCreate=s.slice(0,s.indexOf(","))=="true"?true:false
     }
 
     onOneTimeChanged: {
@@ -71,19 +75,51 @@ Item {
         Cbutton{
             id:open
             text: "打开"
-            width:60
+            width:50
             height: 30
             onClicked: {
                 createnew()
                 if(oneTime)
                     enabled=false
+                if(hideOnCreate)
+                {
+                    per.visible=false
+                }
+            }
+        }
+        Cbutton{
+            id:show
+            text: "全部显示"
+            x:50
+            width:85
+            visible: !oneTime
+            height: 30
+            onClicked: {
+                for(var i=0;i<objs.length;i++)
+                {
+                    objs[i].visible=true
+                }
+            }
+        }
+        Cbutton{
+            id:hide
+            text: "全部隐藏"
+            x:135
+            width:85
+            height: 30
+            visible: !oneTime
+            onClicked: {
+                for(var i=0;i<objs.length;i++)
+                {
+                    objs[i].visible=false
+                }
             }
         }
         Cbutton{
             id:close
             text: "全部关闭"
-            width: 100
-            x:140
+            width: 85
+            x:oneTime?50:220
             height: 30
             onClicked: {
                 delAll()

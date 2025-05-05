@@ -48,6 +48,7 @@ Window {
             $ModuleErs[i].num=i
             $ModuleErs[i].path="./module/"+ts
             $ModuleErs[i].visible=false
+            $ModuleErs[i].per=win
         }
     }
     function unload(){
