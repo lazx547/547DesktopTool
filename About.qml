@@ -6,7 +6,7 @@ Window{
     color: "#00000000"
     x:about.screen.width/2-width/2
     y:about.screen.height/2-height/2
-    width: 300
+    width: 320
     height: 230
     minimumHeight: height
     maximumHeight: height
@@ -72,22 +72,6 @@ Window{
     }
     Item{
         y:20
-        Cbutton{
-            x:parent.width-20
-            y:0
-            type:3
-            width: 20
-            height: 20
-            text: "×"
-            colorBg: "#00000000"
-            colorBorder: "#00000000"
-            font.pixelSize: 25
-            padding: 0
-            topPadding: 0
-            onClicked: {
-                setting.visible=false
-            }
-        }
         Image {
             x:20
             y:10
@@ -99,7 +83,7 @@ Window{
             x:90
             y:35
             font.pixelSize: 20
-            text:"547clock v0.14.2"
+            text:"547DesktopTool v0.2"
         }
         Image {
             x:20
@@ -132,7 +116,7 @@ Window{
             text:"547官网"
             font.pixelSize: 16
             width: 100
-            x:170
+            x:180
             y:170
             height: 20
             onClicked: Qt.openUrlExternally("https://lazx547.github.io")

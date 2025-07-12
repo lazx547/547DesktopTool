@@ -438,12 +438,11 @@ Window {
                 x:30
                 text_width: 0
                 id:sb
-                onValueChanged: nummm=value*50
+                onValueChanged: nummm=value
                 height: 20
                 maxValue: 50
-                Component.onCompleted: setValue(0.02)
+                Component.onCompleted: setValue(1)
                 width: 190
-                step: 0.02
             }
             DelButton{
                 x:0

@@ -143,10 +143,6 @@ Window{
                 onTriggered:$about.visible=true
             }
             Platform.MenuItem{
-                text: "重新启动"
-                onTriggered: Clipboard.restart()
-            }
-            Platform.MenuItem{
                 text: "退出"
                 onTriggered: Qt.quit()
                 icon.source:"qrc:/images/exit.png"
