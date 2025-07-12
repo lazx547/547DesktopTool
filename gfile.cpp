@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QStandardPaths>
+#include <QApplication>
 #include <QCoreApplication>
 GFile::GFile(QObject *parent) :
     QObject(parent)
@@ -58,12 +59,6 @@ QString GFile::getUser()
     return QDir::home().dirName();
 }
 
-void GFile::restart()
-{
-    program.start("./start.bat");
-    program.waitForFinished();
-    exit(0);
-}
 QString GFile::getDesktop()
 {
     return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);

@@ -16,7 +16,7 @@ RC_FILE += 547dt.rc
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        erwindow.cpp \
+        clipboardhandler.cpp \
         gfile.cpp \
         main.cpp
 
@@ -35,15 +35,32 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    erwindow.h \
+    clipboardhandler.h \
+    delbuttontype.h \
     gfile.h
 
-DISTFILES += \
-    Cbutton.qml \
-    Ccheckbox.qml \
-    ColorPicker.qml \
-    CscrollBar.qml \
-    ImaButton.qml \
-    main.qml
-
 VERSION = 0.9
+
+DISTFILES += \
+    About.qml \
+    CCheckBox.qml \
+    CProgreBar.qml \
+    CSaveItem.qml \
+    CSaveItemC.qml \
+    Cbutton.qml \
+    Clock.qml \
+    ColorPickerItem.qml \
+    CscrollBar.qml \
+    DelButton.qml \
+    DelIconButton.qml \
+    GMesenger.qml \
+    ImaButton.qml \
+    ImagePaster.qml \
+    Paster.qml \
+    PasterLoad.qml \
+    Rand.qml \
+    Rand_bar.qml \
+    ScreenShot.qml \
+    SourceItem.qml \
+    SysTray.qml \
+    main.qml

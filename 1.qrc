@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>547dt.png</file>
-        <file>Qt.png</file>
+        <file>images/clock.png</file>
+        <file>images/paster.png</file>
+        <file>images/rand.png</file>
+        <file>images/exit.png</file>
     </qresource>
 </RCC>

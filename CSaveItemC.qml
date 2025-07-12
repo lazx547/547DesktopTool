@@ -19,10 +19,6 @@ Rectangle{
     {
         afile.source=ss
         var s=afile.read(),r_,g_,b_,a_
-        s=s.slice(s.indexOf(",")+1,s.length)
-        s=s.slice(s.indexOf(",")+1,s.length)
-        s=s.slice(s.indexOf(",")+1,s.length)
-        s=s.slice(s.indexOf(",")+1,s.length)
         r_=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
         g_=s.slice(0,s.indexOf(","))
@@ -32,7 +28,6 @@ Rectangle{
         a_=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
         sr1.color=Qt.rgba(r_,g_,b_,a_)                                    //文字颜色
-        s=s.slice(s.indexOf(",")+1,s.length)
         r_=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
         g_=s.slice(0,s.indexOf(","))
@@ -42,7 +37,6 @@ Rectangle{
         a_=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
         sr2.color=Qt.rgba(r_,g_,b_,a_)                                    //边框颜色
-        s=s.slice(s.indexOf(",")+1,s.length)
         r_=s.slice(0,s.indexOf(","))
         s=s.slice(s.indexOf(",")+1,s.length)
         g_=s.slice(0,s.indexOf(","))
@@ -56,7 +50,7 @@ Rectangle{
 
     Timer{
         interval: 10
-        onTriggered:setc("./file/saves/"+num+".txt")
+        onTriggered:setc("./file/saves_clock/"+num+".txt")
         repeat: false
         running: true
     }
@@ -105,18 +99,6 @@ Rectangle{
         }
     }
     ImaButton{
-        id:b0
-        x:60
-        radiusBg: 0
-        colorBorder: "#00000000"
-        width: 18
-        height: 18
-        y:1
-        img:"./images/pause.png"
-        toolTipText: "新开"
-        onClicked: $pasterLoad.newP("./file/saves/"+num+".txt")
-    }
-    ImaButton{
         id:b1
         x:80
         radiusBg: 0
@@ -126,7 +108,7 @@ Rectangle{
         y:1
         img:"./images/reset.png"
         toolTipText: "加载"
-        onClicked: file.readA("./file/saves/"+num+".txt")//$load.newP("./file/saves/"+num+".txt")
+        onClicked: file.read2("./file/saves_clock/"+num+".txt")
     }
     ImaButton{
         id:b2
@@ -139,8 +121,8 @@ Rectangle{
         img:"./images/save.png"
         toolTipText:  "保存"
         onClicked: {
-            file.saveA("./file/saves/"+num+".txt")
-            setc("./file/saves/"+num+".txt")
+            file.save2("./file/saves_clock/"+num+".txt")
+            setc("./file/saves_clock/"+num+".txt")
         }
     }
     ImaButton{

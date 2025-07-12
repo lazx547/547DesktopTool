@@ -23,7 +23,12 @@ public:
     Q_INVOKABLE qreal getSysScale(){return 0;}
     Q_INVOKABLE QString getDesktop();
     Q_INVOKABLE void start(){program.start(m_source);}
-    Q_INVOKABLE void restart();
+    Q_INVOKABLE void showPath(){
+        QFileInfo fileInfo(m_source);
+        qDebug()<<fileInfo.absoluteFilePath();
+        QString param = "/select," + QDir::toNativeSeparators(fileInfo.absoluteFilePath());
+        QProcess::startDetached("explorer.exe", QStringList(param));
+    }
     QString m_source;
 
 
