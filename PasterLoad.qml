@@ -40,11 +40,11 @@ Item {
         objs[n].path=p
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
-        $sysTray.add(objs[n],n)
+        sysTray.add(objs[n],n)
     }
 
     function addMenu(n){
-        $sysTray.add(objs[n],n)
+        sysTray.add(objs[n],n)
     }
 
     function toText(n){
@@ -56,17 +56,17 @@ Item {
         objs[n].path="-1"
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
-        $sysTray.add(objs[n],n)
+        sysTray.add(objs[n],n)
     }
 
     function setV(n){
-        $sysTray.sv(objs[n])
+        sysTray.sv(objs[n])
     }
 
     function exit(n)
     {
         try{
-            $sysTray.del(objs[n])
+            sysTray.del(objs[n])
         }
         catch(i){
         }
@@ -109,7 +109,7 @@ Item {
     function delA(){
         for(var i=0;i<objs.length;i++)
         {
-            $sysTray.del(objs[i])
+            sysTray.del(objs[i])
             objs[i].destroy()
         }
         objs=[]
@@ -129,7 +129,7 @@ Item {
             property int thisn
             text: thisn
             onTriggered:{
-                $load.setVisible(thisn,checked)
+                load.setVisible(thisn,checked)
             }
         }
     }

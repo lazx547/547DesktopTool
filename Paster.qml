@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Basic
+import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Dialogs
 import Clipboard 1.0
@@ -11,7 +12,12 @@ Window {
     height: 480
     minimumWidth: 100
     minimumHeight: 50
-    flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
+    flags: {
+        var r=Qt.FramelessWindowHint
+        r|=top?Qt.WindowStaysOnTopHint:null
+        r|=ghost?Qt.WindowTransparentForInput:null
+        return r
+    }
     color: "#00000000"
     visible: false
     
@@ -23,6 +29,7 @@ Window {
     property bool dragging: false
     property int x0
     property int y0
+    property bool ghost:false
     property int edgeThreshold: 5
     property font sfont
     property string name:""
@@ -30,7 +37,7 @@ Window {
     property string path:"./data.ini"
     property bool lock:lock_set.checked
     property bool top:top_set.checked
-    property color topic_color:"#2080f0"
+    property color topic_color:$topic_color
     property color font_color:"#2080f0"
     property color back_color
     property int border_width
@@ -40,16 +47,11 @@ Window {
         family: "微软雅黑"
         bold: false
     }
-    
-    onTopChanged: {
-        flags=top?Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint:Qt.FramelessWindowHint
-    }
-    
     function read(){
-        if($file.is("./data.ini"))
+        if(file.is("./data.ini"))
         {
-            $file.source=path
-            var s=$file.read(),r_,g_,b_,a_
+            file.source=path
+            var s=file.read(),r_,g_,b_,a_
             window.width=s.slice(0,s.indexOf(","))
             s=s.slice(s.indexOf(",")+1,s.length)//,
             window.height=s.slice(0,s.indexOf(","))
@@ -106,10 +108,12 @@ Window {
         {
             sfont.family="微软雅黑"
         }
-        resize()
+        text__.text=text_.text=Clipboard.pasteText()
+        resize(text__.text)
     }
-    function resize(){
-        metrics.text=text__.text=text_.text=Clipboard.pasteText()
+    function resize(s){
+        metrics.text=""
+        metrics.text=s
     }
     onPathChanged: {
         gfile.readA(path)
@@ -136,17 +140,17 @@ Window {
         a+=font_bord.checked+",fc:,"
         a+=font_center.seleted+",ff:,"
         a+=font_.family+","
-        $file.source="./data.ini"
-        $file.write(a)
+        file.source="./data.ini"
+        file.write(a)
     }
     GFile{
         id:gfile
 
         function readA(p){
-            if($file.is(p))
+            if(file.is(p))
             {
-                $file.source=p
-                var s=$file.read(),r_,g_,b_,a_
+                file.source=p
+                var s=file.read(),r_,g_,b_,a_
                 window.width=Number(s.slice(0,s.indexOf(",")))
                 s=s.slice(s.indexOf(",")+1,s.length)//,
                 window.height=Number(s.slice(0,s.indexOf(",")))
@@ -217,13 +221,12 @@ Window {
             a+=font_center.seleted+",ff:,"
             a+=font_.family+",te:,"
             a+=text_.text+","
-            $file.source=p
-            $file.write(a)
+            file.source=p
+            file.write(a)
         }
     }
     Rectangle{
         Text {
-            //width: sys_width
             visible: false
             onTextChanged: {
                 var a=sys_width
@@ -238,7 +241,6 @@ Window {
                 console.log(width+":"+height)
                 console.log(window.width+":"+window.height)
             }
-
             id: metrics
             font: font_
         }
@@ -344,7 +346,7 @@ Window {
         visible:false
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
         width: 112
-        height:242
+        height:282
         color:"transparent"
         minimumWidth: 112
         onActiveFocusItemChanged: {//失去焦点时隐藏
@@ -454,6 +456,63 @@ Window {
                     text__.text=text_.text=Clipboard.pasteText()
                     menu_.visible=false
                 }
+            }/*
+            Cbutton{
+                y:top_set.height*6
+                type:1
+                width: parent.width
+                text:"命名"
+                onClicked: {
+                    inputDialog.open()
+                }
+                Dialog {
+                    id: inputDialog
+                    title: "请输入名称"
+                    anchors.centerIn: parent
+                    modal: true
+                    standardButtons: Dialog.Ok | Dialog.Cancel
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 0
+                        Label {
+                            text: "请输入名称:"
+                            Layout.alignment: Qt.AlignLeft
+                        }
+
+                        TextField {
+                            id: textInput
+                            Layout.fillWidth: true
+                            placeholderText: ""
+                            focus: true
+                            onAccepted: {
+                                if (textInput.text.length > 0) {
+                                    inputDialog.accept()
+                                }
+                            }
+                        }
+                    }
+
+                    onAccepted: {
+
+                        sysTray.rename(name,textInput.text)
+                        textInput.text = ""
+                    }
+
+                    onRejected: {
+                        textInput.text = ""
+                    }
+                }
+            }*/
+            Cbutton{
+                y:top_set.height*6
+                type:1
+                width: parent.width
+                text:"自动调整大小"
+                onClicked: {
+                    menu_.visible=false
+                    resize(text__.text)
+                }
             }
             Cbutton{
                 FileDialog{
@@ -467,7 +526,7 @@ Window {
                         gfile.write(text_.text)
                     }
                 }
-                y:top_set.height*6
+                y:top_set.height*7
                 type:1
                 width: parent.width
                 text:"保存为"
@@ -477,19 +536,19 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*7
+                y:top_set.height*8
                 type:1
                 width: parent.width
                 text:"转换为图片"
                 onClicked: {
                     menu_.visible=false
                     win.grabToImage(function(result) {
-                        $pasterLoad.toImage(thisn,result.image)
+                        pasterLoad.toImage(thisn,result.image)
                     });
                 }
             }
             Cbutton{
-                y:top_set.height*8
+                y:top_set.height*9
                 type:1
                 width: parent.width
                 text:"保存为图片"
@@ -502,35 +561,34 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*9
+                y:top_set.height*10
                 type:1
                 width: parent.width
                 text: "隐藏"
                 onClicked: {
-                    $pasterLoad.setV(thisn)
+                    pasterLoad.setV(thisn)
                     menu_.visible=false
                 }
             }
-            /*
             Cbutton{
-                y:top_set.height*6
+                y:top_set.height*11
                 type:1
                 width: parent.width
                 text: "幽灵模式"
                 onClicked: {
                     menu_.visible=false
-                    sysTray.ghost()
+                    ghost=true
                 }
-            }*/
+            }
             Cbutton{
-                y:top_set.height*10
+                y:top_set.height*12
                 type:1
                 width: parent.width
                 text: "关闭"
                 onClicked: {
                     menu_.visible=false
                     save()
-                    $pasterLoad.exit(thisn)
+                    pasterLoad.exit(thisn)
                 }
             }
         }
@@ -664,7 +722,7 @@ Window {
             }
         }
     }
-    Window{
+    Window{//个性化
         id:custom
         visible:false
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
@@ -848,7 +906,6 @@ Window {
                         height: 20
                         type:2
                         img:"./images/center.png"
-                        font.bold: true
                         checkable: true
                         seleted: checked
                         onCheckedChanged: {
@@ -857,6 +914,7 @@ Window {
                             else
                                 text_.horizontalAlignment=text__.horizontalAlignment=Text.AlignHCenter
                         }
+                        Component.onCompleted: checked=true
                     }
                     CscrollBar{
                         id:font_size

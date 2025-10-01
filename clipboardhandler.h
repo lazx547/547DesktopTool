@@ -22,6 +22,24 @@ public:
     Q_INVOKABLE void copyText(const QString &text) {
         QGuiApplication::clipboard()->setText(text);
     }
+    Q_INVOKABLE void copyImage(const QString name,int type) {
+        QString source;
+        switch(type){
+        case 0:source="./file/temp/"+name+".png";
+            break;
+        case 1:source=name;
+            break;
+        case 2:{QMessageBox* msgBox = new QMessageBox(QMessageBox::Critical,
+                                                  "错误",
+                                                  "不支持复制网络图片",
+                                                  QMessageBox::Ok);
+            msgBox->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+            msgBox->setAttribute(Qt::WA_DeleteOnClose);
+            msgBox->show();
+            return;}
+        }
+        QGuiApplication::clipboard()->setImage(QImage(source));
+    }
 
     Q_INVOKABLE void copyText(const QImage &image) {
         QGuiApplication::clipboard()->setImage(image);

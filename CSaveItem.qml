@@ -114,7 +114,7 @@ Rectangle{
         y:1
         img:"./images/pause.png"
         toolTipText: "新开"
-        onClicked: $pasterLoad.newP("./file/saves/"+num+".txt")
+        onClicked: pasterLoad.newP("./file/saves/"+num+".txt")
     }
     ImaButton{
         id:b1
@@ -126,7 +126,7 @@ Rectangle{
         y:1
         img:"./images/reset.png"
         toolTipText: "加载"
-        onClicked: file.readA("./file/saves/"+num+".txt")//$load.newP("./file/saves/"+num+".txt")
+        onClicked: file.readA("./file/saves/"+num+".txt")//load.newP("./file/saves/"+num+".txt")
     }
     ImaButton{
         id:b2

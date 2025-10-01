@@ -8,7 +8,12 @@ import GFile 1.2
 
 Window{
     id: window
-    flags:top?Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint:Qt.FramelessWindowHint
+    flags:{
+        var r=Qt.FramelessWindowHint
+        r|=top?Qt.WindowStaysOnTopHint:null
+        r|=ghost?Qt.WindowTransparentForInput:null
+        return r
+    }
     width:owidth*win.scale
     height:oheight*win.scale
     color: "transparent"
@@ -18,28 +23,34 @@ Window{
     readonly property real sys_height: window.screen.height
     property bool lock:lock_set.checked
     property bool top:top_set.checked
-    property color $topic_color:"#2080f0"
+    property bool ghost
     property int owidth:140
     property int oheight:40
     property color font_color:"#2080f0"
     property int border_width:0
     property color border_color:"#000000"
     property color back_color
+    property bool auto_save:setting.auto_save
+    property bool h_type:setting.h_type
+    property string h_type_t:setting.h_type_t
+    property bool show_type_ss:setting.show_type_ss
+    property bool show_type_zzz:setting.show_type_zzz
+    property int delT:setting.delT
+    property bool refresh_top:setting.refresh_top
     property font font_:{
         pixelSize: 30
         family: "微软雅黑"
         bold: false
     }
 
-    function show_setting()
-    {
-        setting.visible=true
-    }
-
     function restart(){
         timer_set.f=true
         timer_set.f2=true
         timer_set.running=true
+    }
+
+    function save(){//正常保存
+        file.save2("./value_clock.txt")
     }
     onVisibleChanged: {
         refresh.running=visible
@@ -106,26 +117,15 @@ Window{
                 property int auto_save_delt:0
                 onTriggered:
                 {
-                    if(auto_save.checked)
-                    {
-                        auto_save_delt++
-                        if(auto_save_delt==7200)
-                        {
-                            auto_save_delt=0
-                            file.save()
-                            setting.save()
-                        }
-                    }
-
-                    if(h_type.checked)
-                        time_text.text=Qt.formatDateTime(new Date(), h_type_t.text)
-                    else if(delT.delT==0)
+                    if(h_type)
+                        time_text.text=Qt.formatDateTime(new Date(), h_type_t)
+                    else if(delT==0)
                     {
                         time_text.text=Qt.formatDateTime(new Date(),"hh:mm")
-                        if(show_type_ss.checked)
+                        if(show_type_ss)
                         {
                             time_text.text+=":"+Qt.formatDateTime(new Date(),"ss")
-                            if(show_type_zzz.checked)
+                            if(show_type_zzz)
                                 time_text.text+="."+Qt.formatDateTime(new Date(),"zzz")
                         }
                     }
@@ -134,7 +134,7 @@ Window{
                         var h,m,s,y,M,z,d;
                         h=Number(Qt.formatDateTime(new Date(),"hh"))
                         m=Number(Qt.formatDateTime(new Date(),"mm"))
-                        s=Number(Qt.formatDateTime(new Date(),"ss"))+delT.delT
+                        s=Number(Qt.formatDateTime(new Date(),"ss"))+delT
                         z=Qt.formatDateTime(new Date(),"zzz")
                         if(s<0)
                         {
@@ -171,14 +171,14 @@ Window{
                         if(h<10)
                             h="0"+h
                         time_text.text=h+":"+m
-                        if(show_type_ss.checked)
+                        if(show_type_ss)
                         {
                             time_text.text+=":"+s
-                            if(show_type_zzz.checked)
+                            if(show_type_zzz)
                                 time_text.text+=":"+z
                         }
                     }
-                    if(refresh_top.checked)
+                    if(refresh_top)
                     {
                         window.raise()
                     }
@@ -269,7 +269,8 @@ Window{
             a+=time_text.anchors.verticalCenterOffset+","                                                        //文字竖直偏移
             a+=font_bord.checked+","                                                                                      //是否加粗
             a+=top+","                                                                                     //是否置顶
-            a+=lock.checked+","                                                                                    //是否锁定
+            a+=lock+","                                                                                    //是否锁定
+            a+=setting.get_clock_value()+","
             a+=window.x+","
             a+=window.y+","
             a+=win.scale+","
@@ -343,6 +344,19 @@ Window{
             s=s.slice(s.indexOf(",")+1,s.length)
             lock_set.checked=s.slice(0,s.indexOf(","))=="true" ? true:false    //是否锁定
             s=s.slice(s.indexOf(",")+1,s.length)
+            var set_=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            set_+=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            set_+=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            set_+=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            set_+=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            set_+=s.slice(0,s.indexOf(","))+","
+            s=s.slice(s.indexOf(",")+1,s.length)
+            setting.set_clock_value(set_)
             window.x=Number(s.slice(0,s.indexOf(",")))
             s=s.slice(s.indexOf(",")+1,s.length)
             window.y=Number(s.slice(0,s.indexOf(",")))
@@ -401,7 +415,7 @@ Window{
                 id:lock_set
                 type:1
                 y:top_set.height
-                width: parent.width*2
+                width: parent.width
                 text: "锁定"
                 checkable: true
                 onClicked: menu_.visible=false
@@ -466,7 +480,7 @@ Window{
                 text: "幽灵模式"
                 onClicked: {
                     menu_.visible=false
-                    $sysTray.ghost()
+                    ghost=!ghost
                 }
             }
             Cbutton{
@@ -584,13 +598,13 @@ Window{
                         s=sis.length+","
                         for(i=0;i<sis.length;i++)
                             s+=sis[i].num+","
-                        file.source="./file/saves/num.txt"
+                        file.source="./file/saves_clock/num.txt"
                         file.write(s)
                     }
                 }
 
                 Component.onCompleted: {
-                    file.source="./file/saves/num.txt"
+                    file.source="./file/saves_clock/num.txt"
                     var s=file.read()
                     var a=Number(s.slice(0,s.indexOf(","))),im
                     var Csaves=Qt.createComponent("./CSaveItemC.qml")
@@ -761,7 +775,7 @@ Window{
                     color:"#00000000"
                     Rectangle{
                         anchors.fill: parent
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                         color:"#f2f2f2"
                     }
                     CscrollBar{
@@ -803,7 +817,7 @@ Window{
                     color:"#00000000"
                     Rectangle{
                         anchors.fill: parent
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                         color:"#f2f2f2"
                     }
                     CscrollBar{
@@ -861,7 +875,7 @@ Window{
                     color:"#00000000"
                     Rectangle{
                         anchors.fill: parent
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                         color:"#f2f2f2"
                     }
                     CscrollBar{
@@ -911,7 +925,7 @@ Window{
                     Rectangle{
                         anchors.fill: parent
                         color:"#f2f2f2"
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                     }
                     Cbutton{
                         id:font_bord
@@ -1033,7 +1047,7 @@ Window{
                     Rectangle{
                         anchors.fill: parent
                         color:"#f2f2f2"
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                     }
                     ColorPickerItem{
                         id:back_color_picker
@@ -1069,7 +1083,7 @@ Window{
                     Rectangle{
                         anchors.fill: parent
                         color:"#f2f2f2"
-                        border.color: window.$topic_color
+                        border.color: $topic_color
                     }
                     Text{
                         text: "位置"
@@ -1204,256 +1218,6 @@ Window{
                 if (active && drag_detect.dragging)
                 {
                     custom.startSystemMove()
-                }
-            }
-        }
-    }
-    Window{
-        id:setting
-        visible:false
-        flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
-        x:(sys_width-width)/2
-        y:(sys_height-height)/2
-        width: 406
-        height:242
-        color:"#00000000"
-        function save(){
-            file.source="./setting.ini"
-            var a
-            a=topic_color_picker.r+","+topic_color_picker.g+","+topic_color_picker.b+","+topic_color_picker.a+","
-            a+=refresh_top.checked+","
-            a+=delT.value+","+h_type_t.text+","+h_type.checked+","+show_type_ss.checked+","+show_type_zzz.checked+","+auto_save.checked+","
-            file.write(a)
-        }
-        function read(){
-            file.source="./setting.ini"
-            var s=file.read(),r_,g_,b_,a_
-            r_=s.slice(0,s.indexOf(","))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            g_=s.slice(0,s.indexOf(","))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            b_=s.slice(0,s.indexOf(","))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            a_=s.slice(0,s.indexOf(","))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            topic_color_picker.setColor(r_,g_,b_,a_)
-            refresh_top.checked=s.slice(0,s.indexOf(","))=="true" ? true : false
-            s=s.slice(s.indexOf(",")+1,s.length)
-            delT.setValue(s.slice(0,s.indexOf(",")))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            h_type_t.text=s.slice(0,s.indexOf(","))
-            s=s.slice(s.indexOf(",")+1,s.length)
-            h_type.checked=s.slice(0,s.indexOf(","))=="true" ? true : false
-            s=s.slice(s.indexOf(",")+1,s.length)
-            show_type_ss.checked=s.slice(0,s.indexOf(","))=="true" ? true : false
-            s=s.slice(s.indexOf(",")+1,s.length)
-            show_type_zzz.checked=s.slice(0,s.indexOf(","))=="true" ? true : false
-            s=s.slice(s.indexOf(",")+1,s.length)
-            auto_save.checked=s.slice(0,s.indexOf(","))=="true" ? true : false
-        }
-
-        Rectangle{
-            anchors.fill: parent
-            border.color: $topic_color
-            color:"#f2f2f2"
-        }
-        Rectangle{
-            width: parent.width
-            height: 20
-            color: $topic_color
-            Text{
-                text:"547clock设置"
-                font.pixelSize: 15
-            }
-            MouseArea {
-                anchors.fill: parent
-                property int dragX
-                property int dragY
-                property bool dragging
-                onPressed: {
-                    dragX = mouseX
-                    dragY = mouseY
-                    dragging = true
-                }
-                onReleased: {
-                    dragging = false
-                }
-                onPositionChanged: {
-                    if (dragging) {
-                        setting.x += mouseX - dragX
-                        setting.y += mouseY - dragY
-                    }
-                }
-            }
-            Cbutton{
-                x:parent.width-20
-                y:0
-                type:3
-                width: 20
-                height: 20
-                text: "×"
-                colorBg: "#00000000"
-                colorBorder: "#00000000"
-                font.pixelSize: 25
-                padding: 0
-                topPadding: 0
-                onClicked: {
-                    setting.visible=false
-                }
-            }
-            Item{
-                x:1
-                y:20
-                Text{
-                    text:"主题色"
-                    font.pixelSize: 15
-                }
-                ColorPickerItem{
-                    id:topic_color_picker
-                    y:20
-                    onColor_Changed: $topic_color=color_
-                    Component.onCompleted: setColor(32/256, 128/256, 240/256,1)
-                }
-                CCheckBox{
-                    id:refresh_top
-                    y:105
-                    scale: 0.75
-                    transformOrigin: Item.TopLeft
-                    text: "刷新显示在最上层"
-                }
-                CscrollBar{
-                    id:delT
-                    y:135
-                    width: 200
-                    height: 15
-                    text: "时差"
-                    minValue: -60
-                    maxValue: 60
-                    Component.onCompleted: setValue(reset)
-                    reset:0
-                    property int delT:value
-                }
-                Rectangle{
-                    y:152
-                    Text{
-                        text:"显示模式"
-                        font.pixelSize: 15
-                    }
-                    CCheckBox{
-                        id:show_type_ss
-                        height: 16
-                        x:80
-                        transformOrigin: Item.TopLeft
-                        font.pixelSize: 15
-                        text:"秒"
-                    }
-                    CCheckBox{
-                        id:show_type_zzz
-                        enabled: show_type_ss.checked
-                        height: 16
-                        x:120
-                        transformOrigin: Item.TopLeft
-                        font.pixelSize: 15
-                        text:"毫秒"
-                    }
-                }
-                Item{
-                    y:177
-                    CCheckBox{
-                        id:auto_save
-                        height: 16
-                        transformOrigin: Item.TopLeft
-                        font.pixelSize: 15
-                        text:"自动保存"
-                    }
-                    CProgreBar{
-                        id:auto_save_pb
-                        x:90
-                        width: 100
-                        percent: refresh.auto_save_delt/7200
-                    }
-                }
-                Cbutton{
-                    y:200
-                    x:2
-                    width: 120
-                    height: 20
-                    text: "保存"
-                    onClicked: setting.save()
-                }
-                Cbutton{
-                    y:200
-                    x:122
-                    width: 60
-                    height: 20
-                    text: "定位"
-                    onClicked:
-                    {
-                        file.source="./setting_clock.ini"
-                        file.showPath()
-                        file.source="./value_clock.txt"
-                        file.showPath()
-                    }
-                }
-                ImaButton{
-                    img:"./images/about.png"
-                    y:200
-                    x:182
-                    width: 20
-                    height:20
-                    onClicked: $about.visible=true
-                }
-            }
-            Item{
-                x:203
-                y:20
-                Rectangle{
-                    Text{
-                        x:2
-                        text:"高级显示模式:"
-                        font.pixelSize: 15
-                    }
-                    CCheckBox{
-                        id:h_type
-                        x:90
-                        y:-1
-                        font.pixelSize: 11
-                        text:"启用(不兼容时差)"
-                    }
-                    TextArea{
-                        id:h_type_t
-                        x:2
-                        y:20
-                        width: 196
-                        height: 20
-                        text:"hh:mm:ss"
-                        color: "black"
-                        padding:0
-                        font.pixelSize: 15
-                        background:Rectangle{
-                            anchors.fill: parent
-                            border.width: 1
-                            border.color: "#80808080"
-                        }
-                    }
-                    Rectangle{
-                        x:2
-                        y:42
-                        width: 196
-                        height: 177
-                        TextArea{
-                            padding:0
-                            font.pixelSize:12
-                            property string tex:"d 日 (1-31)       dd日 (01-31)\nddd 星期 (Mon-Sun)\ndddd 星期 (Monday-Sunday)\nM 月 (1-12)      MM 月 (01-12)\nMMM 月 (Jan-Dec)\nMMMM 月 (January-December)\nyy 年 (00-99)    yyyy 年\nh 小时 (0-23)    hh 小时 (00-23)\nm 分钟 (0-59)   mm 分钟 (00-59)\ns 秒 (0-59)        ss 秒 (00-59)\nz 毫秒 (0-999)   zzz 毫秒(000-999)"
-                            text:tex
-                            background:Rectangle{
-                                anchors.fill: parent
-                                border.width: 1
-                                border.color: "#80808080"
-                            }
-                            onTextChanged: text=tex
-                        }
-                    }
                 }
             }
         }

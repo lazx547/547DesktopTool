@@ -83,7 +83,7 @@ Window{
             x:90
             y:35
             font.pixelSize: 20
-            text:"547DesktopTool v0.2"
+            text:"547DesktopTool v0.3"
         }
         Image {
             x:20

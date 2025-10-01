@@ -8,7 +8,7 @@ import QtQuick.Controls.Basic
 Window {
     id: window
     flags: Qt.FramelessWindowHint|Qt.Window
-    visible:true
+    visible:false
     width: 584
     height: 334
     color: "#00000000"

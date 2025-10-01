@@ -9,7 +9,12 @@ Window {
     id: window
     minimumWidth: 20
     minimumHeight: 20
-    flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
+    flags: {
+        var r=Qt.FramelessWindowHint
+        r|=top?Qt.WindowStaysOnTopHint:null
+        r|=ghost?Qt.WindowTransparentForInput:null
+        return r
+    }
     color: "#00000000"
     visible: false
 
@@ -23,6 +28,7 @@ Window {
     property bool dragging: false
     property int x0
     property int y0
+    property bool ghost:false
     property int bw:3
     property int thisn:-99
     property string name:""
@@ -38,10 +44,6 @@ Window {
 
     GFile{
         id:file
-    }
-
-    onTopChanged: {
-        flags=top?Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint:Qt.FramelessWindowHint
     }
 
     onThisnChanged: {
@@ -83,7 +85,7 @@ Window {
         z:2
         cursorShape: {
             const p = Qt.point(mouseX, mouseY);
-            const b = bw; // Increase the corner size slightly
+            const b = bw;
             if (p.x < b && p.y < b) return Qt.SizeFDiagCursor;
             if (p.x >= width - b && p.y >= height - b) return Qt.SizeFDiagCursor;
             if (p.x >= width - b && p.y < b) return Qt.SizeBDiagCursor;
@@ -108,7 +110,7 @@ Window {
         onPressed: (mouse)=>{
                        if(!lock){
                            const p = mouse
-                           const b = bw; // Increase the corner size slightly
+                           const b = bw;
                            if (mouse.x < b) { e = Qt.LeftEdge }
                            if (mouse.x >= width - b) { e = Qt.RightEdge }
                            if (mouse.y < b) { e = Qt.TopEdge }
@@ -163,7 +165,7 @@ Window {
                 {
                     console.log("IP:error")
                     if(last=="-1")
-                        $pasterLoad.toText(thisn)
+                        pasterLoad.toText(thisn)
                     else
                         source=last
                 }
@@ -175,7 +177,7 @@ Window {
                     width_=image.width
                     height_=image.height
                     resize()
-                    $pasterLoad.addMenu(thisn)
+                    pasterLoad.addMenu(thisn)
                 }
                 else if(status==Image.Loading)
                     console.log("IP:ing")
@@ -190,7 +192,7 @@ Window {
         visible:false
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
         width: 112
-        height:182
+        height:222
         color:"transparent"
         minimumWidth: 112
         onActiveFocusItemChanged: {//失去焦点时隐藏
@@ -245,9 +247,59 @@ Window {
                 checkable: true
                 onClicked: menu_.visible=false
             }
-
             Cbutton{
                 y:top_set.height*2
+                type:1
+                width: parent.width
+                text:"复制图片路径"
+                onClicked: {
+                    Clipboard.copyText(image.source)
+                    menu_.visible=false
+                }
+            }
+            Cbutton{
+                y:top_set.height*3
+                type:1
+                width: parent.width
+                text:"复制"
+                onClicked: {
+                    var s=String(image.source)
+                    if(s.substring(0,1)==".")
+                    {
+                        s=s.slice(s.indexOf("/")+1,s.length)
+                        s=s.slice(s.indexOf("/")+1,s.length)
+                        s=s.slice(0,s.indexOf("."))
+                        Clipboard.copyImage(s,0)
+                    }
+                    else if(s.substring(0,1)=="f")
+                        Clipboard.copyImage(s,1)
+                    else if(s.substring(0,1)=="h")
+                        Clipboard.copyImage(s,2)
+                    menu_.visible=false
+                }
+            }
+            Cbutton{
+                y:top_set.height*4
+                type:1
+                width: parent.width
+                text:"粘贴"
+                onClicked: {
+                    var s=String()
+                    if(Clipboard.hasImage())
+                        s=String(Clipboard.saveImage())
+                    else
+                        s=String(Clipboard.pasteText())
+                    if(image.source!=s)
+                    {
+                        image.last=image.source
+                        image.source=Clipboard.pasteText()
+                        menu_.visible=false
+                    }
+                }
+            }
+
+            Cbutton{
+                y:top_set.height*5
                 type:1
                 id:save_bu
                 width: parent.width
@@ -269,74 +321,45 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*3
-                type:1
-                width: parent.width
-                text:"复制图片路径"
-                onClicked: {
-                    Clipboard.copyText(image.source)
-                    menu_.visible=false
-                }
-            }
-            Cbutton{
-                y:top_set.height*4
-                type:1
-                width: parent.width
-                text:"粘贴图片路径"
-                onClicked: {
-                    var s=String()
-                    if(Clipboard.hasImage())
-                        s=String(Clipboard.saveImage())
-                    else
-                        s=String(Clipboard.pasteText())
-                    if(image.source!=s)
-                    {
-                        image.last=image.source
-                        image.source=Clipboard.pasteText()
-                        menu_.visible=false
-                    }
-                }
-            }
-
-            Cbutton{
-                y:top_set.height*5
+                y:top_set.height*6
                 type:1
                 width: parent.width
                 text:"显示为文字"
                 onClicked: {
                     menu_.visible=false
                     Clipboard.copyText(image.source)
-                    $pasterLoad.toText(thisn)
+                    pasterLoad.toText(thisn)
                 }
             }
             Cbutton{
-                y:top_set.height*6
+                y:top_set.height*7
                 type:1
                 width: parent.width
                 text: "隐藏"
                 onClicked: {
-                    $pasterLoad.setV(thisn)
+                    pasterLoad.setV(thisn)
+                    menu_.visible=false
                     window.visible=false
                 }
-            }/*
+            }
             Cbutton{
-                y:top_set.height*6
+                y:top_set.height*8
                 type:1
                 width: parent.width
                 text: "幽灵模式"
                 onClicked: {
                     menu_.visible=false
-                    sysTray.ghost()
+                    ghost=true
                 }
-            }*/
+            }
             Cbutton{
-                y:top_set.height*7
+                y:top_set.height*9
                 type:1
                 width: parent.width
                 text: "关闭"
                 onClicked: {
                     menu_.visible=false
-                    $pasterLoad.exit(thisn)
+                    pasterLoad.exit(thisn)
                 }
             }
         }

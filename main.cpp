@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     qputenv("QT_SCALE_FACTOR",s.toLatin1());
     QUrl url(QStringLiteral("./file/main.qml"));
     QGuiApplication app(argc, argv);
+    app.setWindowIcon(QIcon("qrc:/547dt.png"));
     QSharedMemory sharedMemory("547DesktopTool_v0.2");
     if (sharedMemory.attach()) {
         // 已附加到现有内存段，说明已有实例运行

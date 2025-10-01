@@ -19,16 +19,43 @@ Window {
     }
 
     // 半透明背景层
-    Rectangle {
+    Item {
         id: overlay
         anchors.fill: parent
-        color: "#80000000"
+        Rectangle{
+            color: setting.color_shot?"#80FF0000":"#80000000"
+            x:0
+            y:0
+            width: selectionRect.x+selectionRect.width
+            height: selectionRect.y
+        }
+        Rectangle{
+            color: setting.color_shot?"#8000FF00":"#80000000"
+            x:selectionRect.x+selectionRect.width
+            y:0
+            width: root.screen.width-selectionRect.width-selectionRect.x
+            height: selectionRect.y+selectionRect.height
+        }
+        Rectangle{
+            color: setting.color_shot?"#800000FF":"#80000000"
+            x:selectionRect.x
+            y:selectionRect.y+selectionRect.height
+            width:root.screen.width-selectionRect.x
+            height: root.screen.height-selectionRect.y-selectionRect.height
+        }
+        Rectangle{
+            color: setting.color_shot?"#80000000":"#80000000"
+            x:0
+            y:selectionRect.y
+            width:selectionRect.x
+            height: root.screen.height-selectionRect.y
+        }
     }
 
     // 截取区域
     Rectangle {
         id: selectionRect
-        color: "#20FFFFFF"
+        color: "#00FFFFFF"
         border.color: "#2080f0"
         border.width: 1
         visible: false
@@ -53,7 +80,7 @@ Window {
                            selectionRect.visible = true
                        }
                        else
-                       $pasterLoad.endShot()
+                       pasterLoad.endShot()
                    }
 
         onPositionChanged: (mouse)=>{
@@ -90,7 +117,7 @@ Window {
         Rectangle{
             width: ender.width
             height: 27
-            border.color: "#2080f0"
+            border.color: $topic_color
             color:"#f2f2f2"
         }
         Item{
@@ -101,7 +128,7 @@ Window {
             Rectangle{
                 width: 8
                 height: 25
-                color: "#2080f0"
+                color: $topic_color
                 MouseArea {
                     id:drag_detect
                     anchors.fill: parent
@@ -127,7 +154,7 @@ Window {
                     s=s.slice(s.indexOf("/")+1,s.length)
                     s=s.slice(0,s.indexOf("."))
                     Clipboard.shot(selectionRect.x, selectionRect.y,selectionRect.width, selectionRect.height,s)
-                    $pasterLoad.endShot()
+                    pasterLoad.endShot()
                 }
                 img:"./images/copy.png"
             }
@@ -142,8 +169,8 @@ Window {
                     s=s.slice(s.indexOf("/")+1,s.length)
                     s=s.slice(s.indexOf("/")+1,s.length)
                     s=s.slice(0,s.indexOf("."))
-                    $pasterLoad.shotPaster(selectionRect.x, selectionRect.y,selectionRect.width, selectionRect.height,s)
-                    $pasterLoad.endShot()
+                    pasterLoad.shotPaster(selectionRect.x, selectionRect.y,selectionRect.width, selectionRect.height,s)
+                    pasterLoad.endShot()
                 }
                 img:"./images/top.png"
             }
@@ -153,7 +180,7 @@ Window {
                 width: 25
                 height: 25
                 onClicked: {
-                    $pasterLoad.endShot()
+                    pasterLoad.endShot()
                 }
                 img:"./images/close.png"
             }
@@ -173,6 +200,6 @@ Window {
     // ESC键退出
     Shortcut {
         sequence: "Escape"
-        onActivated: $pasterLoad.endShot()
+        onActivated: pasterLoad.endShot()
     }
 }
