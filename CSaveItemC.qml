@@ -11,10 +11,15 @@ Rectangle{
     border.color: "#80808080"
     width: 140
     height: 20
+    property string name:num
     GFile{
         id:afile
     }
     z:-1
+    function run(){
+        file.read2("./file/saves_clock/"+num+".txt")
+    }
+
     function setc(ss)
     {
         afile.source=ss

@@ -565,6 +565,7 @@ Window{
                         for(var i=0;i<saves.sis.length;i++)
                             s+=saves.sis[i].num+","
                         file.write(s)
+                        sysTray.clock_.add(im)
                     }
                 }
             }
@@ -585,6 +586,7 @@ Window{
                     property var sis:[]
                     function remove(n){
                         n--
+                        sysTray.clock_.del(sis[n].name)
                         sis[n].destroy()
                         var i,s
                         for(i=n;i<sis.length-1;i++)
@@ -618,6 +620,7 @@ Window{
                         im.num=s.slice(0,s.indexOf(","))
                         im.y=(n-1)*20
                         im.parent=saves
+                        sysTray.clock_.add(im)
                     }
                     saves.height=20*a
                 }

@@ -40,11 +40,11 @@ Item {
         objs[n].path=p
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
-        sysTray.add(objs[n],n)
+        sysTray.paster.add(objs[n],n)
     }
 
     function addMenu(n){
-        sysTray.add(objs[n],n)
+        sysTray.paster.add(objs[n],n)
     }
 
     function toText(n){
@@ -56,17 +56,17 @@ Item {
         objs[n].path="-1"
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
-        sysTray.add(objs[n],n)
+        sysTray.paster.add(objs[n],n)
     }
 
     function setV(n){
-        sysTray.sv(objs[n])
+        sysTray.paster.sv(objs[n])
     }
 
     function exit(n)
     {
         try{
-            sysTray.del(objs[n])
+            sysTray.paster.del(objs[n])
         }
         catch(i){
         }
@@ -109,7 +109,7 @@ Item {
     function delA(){
         for(var i=0;i<objs.length;i++)
         {
-            sysTray.del(objs[i])
+            sysTray.paster.del(objs[i])
             objs[i].destroy()
         }
         objs=[]
@@ -122,13 +122,18 @@ Item {
         for(var i=0;i<objs.length;i++)
             objs[i].visible=false
     }
+    function rename(n,text){
+        sysTray.paster.rename(objs[n],text)
+    }
+
+
 
     Component {
         id: menuItemComponent
         MenuItem {
             property int thisn
             text: thisn
-            onTriggered:{
+            onTriggered:{X
                 load.setVisible(thisn,checked)
             }
         }

@@ -15,6 +15,7 @@ Window{
     Rectangle{
         anchors.fill: parent
         border.color: $topic_color
+        border.width: 2
         color:"#f2f2f2"
     }
     Rectangle{
@@ -25,7 +26,7 @@ Window{
             width: 20
             height: 20
             source:"qrc:/547dt.png"
-            scale: 0.7
+            scale: 0.8
         }
 
         Text{

@@ -10,7 +10,7 @@ Window{
     x:(root.screen.width-width)/2
     y:(root.screen.height-height)/2
     width: 410
-    height:362
+    height:337
     color:"#00000000"
     title:"547desktopTool设置"
 
@@ -144,122 +144,199 @@ Window{
             }
             CCheckBox{
                 id:colorful_shot
-                height: 16
                 y:100
                 x:2
-                transformOrigin: Item.TopLeft
+                height: 16
                 font.pixelSize: 15
                 text:"绚丽截图"
             }
+            Item{
+                y:100
+                x:102
+                CCheckBox{
+                    id:auto_save
+                    height: 16
+                    font.pixelSize: 15
+                    text:"自动保存"
+                    onCheckedChanged: save()
+                }
+                Timer{
+                    interval: 72000
+                    running: auto_save.checked
+                    repeat: true
+                    onTriggered: {
+                        clock.save()
+                        setting.save()
+                    }
+                }
+            }
             Rectangle{
-                y:120
-                x:2
                 width: 200
-                height: 165
+                height: 100
+                y:122
+                x:2/*
+                TextArea{
+                    id:save_text
+                    x:1
+                    y:1
+                    width: 80
+                    height: 20
+                    color: "black"
+                    font.pixelSize: 13
+                    background:Rectangle{
+                        anchors.fill: parent
+                        border.width: 1
+                        border.color: "#80808080"
+                    }
+                    onTextChanged: {
+                    }
+                }*/
                 border.color: "#80000000"
                 border.width: 1
                 color:"#00000000"
                 Text{
-                    x:2
-                    text:"定位配置文件/目录"
-                    font.pixelSize: 15
+                    y:3
+                    text:"截图快捷键（全局）"
+                    font.pixelSize: 13
                 }
-                Cbutton{
+
+                TextField {
+                    id: hotkey_shot
                     y:20
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "设置配置文件"
-                    onClicked:
-                    {
-                        file.source="./setting.txt"
-                        file.showPath()
+                    x:1
+                    transformOrigin: Item.TopLeft
+                    width: 198
+                    padding:1
+                    font.pixelSize: 14
+                    placeholderText: "Ctrl+ALt+S"
+                    background:Rectangle{
+                        anchors.fill: parent
+                        border.width: 1
+                        border.color: "#80808080"
                     }
                 }
-                Cbutton{
-                    y:40
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "547抽号器（边栏）名单配置"
-                    onClicked:
-                    {
-                        file.source="./source_.ini"
-                        file.showPath()
-                    }
+                Text{
+                    y:43
+                    text:"贴图快捷键（全局）"
+                    font.pixelSize: 13
                 }
-                Cbutton{
+                TextField {
+                    id: hotkey_paster
                     y:60
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "547clock个性化配置"
-                    onClicked:
-                    {
-                        file.source="./value_clock.txt"
-                        file.showPath()
+                    x:1
+                    transformOrigin: Item.TopLeft
+                    width: 198
+                    padding:1
+                    font.pixelSize: 14
+                    placeholderText: "Ctrl+ALt+P"
+                    background:Rectangle{
+                        anchors.fill: parent
+                        border.width: 1
+                        border.color: "#80808080"
                     }
                 }
                 Cbutton{
                     y:80
-                    x:20
-                    width: 160
+                    x:80
+                    width: 120
                     height: 20
-                    text: "547paster个性化配置"
+                    text: "保存（重启生效）"
                     onClicked:
                     {
-                        file.source="./data.ini"
-                        file.showPath()
-                    }
-                }
-                Cbutton{
-                    y:100
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "547抽号器班级名单目录"
-                    onClicked:
-                    {
-                        file.source="./source"
-                        file.showPath()
-                    }
-                }
-                Cbutton{
-                    y:120
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "547clock存档目录"
-                    onClicked:
-                    {
-                        file.source="./file/saves_clock"
-                        file.showPath()
-                    }
-                }
-                Cbutton{
-                    y:140
-                    x:20
-                    width: 160
-                    height: 20
-                    text: "547paster存档目录"
-                    onClicked:
-                    {
-                        file.source="./file/saves"
-                        file.showPath()
+                        file.source="./hotkey.ini"
+                        var s=
+                        file.write(String((hotkey_shot.text===""?hotkey_shot.placeholderText:hotkey_shot.text)+","
+                                          +(hotkey_paster.text===""?hotkey_paster.placeholderText:hotkey_paster.text)+","))
                     }
                 }
             }
 
-            Cbutton{
-                text:"关于"
-                y:295
+            Item{
+                y:218
                 x:2
-                width: 100
-                height:20
-                onClicked:
-                {
-                    about.visible=true
-                    about.raise()
+                Text{
+                    y:5
+                    text:"定位/打开配置文件（夹）"
+                    font.pixelSize: 15
+                }
+                ComboBox {
+                    id:locatee
+                    transformOrigin: Item.TopLeft
+                    y:25
+                    scale: 0.75
+                    width: 267
+                    valueRole: "value"
+                    textRole: "text"
+                    onCurrentValueChanged:
+                            file_open.enabled=currentValue==0
+                    model: [
+                        {value:0,text: "全局快捷键配置文件" },
+                        {value:0,text: "程序缩放配置文件" },
+                        {value:0,text: "设置配置文件" },
+                        {value:0,text: "547抽号器（边栏）名单配置"},
+                        {value:0,text: "547clock个性化配置"},
+                        {value:0,text: "547paster个性化配置"},
+                        {value:1,text: "547抽号器班级名单目录"},
+                        {value:1,text: "547clock存档目录"},
+                        {value:1,text: "547paster存档目录"}
+                    ]
+                    function getValue(){
+                        var s
+                        switch(currentIndex){
+                        case 0:
+                            s="./hotkey.ini"
+                            break
+                        case 1:
+                            s="./scale.txt"
+                            break
+                        case 2:
+                            s="./setting.ini"
+                            break
+                        case 3:
+                            s="./source_.ini"
+                            break
+                        case 4:
+                            s="./value_clock.txt"
+                            break
+                        case 5:
+                            s="./data.ini"
+                            break
+                        case 6:
+                            s="./source"
+                            break
+                        case 7:
+                            s="./file/saves_clock"
+                            break
+                        case 8:
+                            s="./file/saves"
+                            break
+                        }
+                        return s;
+                    }
+                }
+                Cbutton{
+                    y:55
+                    width: 100
+                    height: 20
+                    text: "定位"
+                    onClicked:
+                    {
+                        file.source=locatee.getValue()
+                        file.showPath()
+                    }
+                }
+                Cbutton{
+                    id:file_open
+                    y:55
+                    x:100
+                    width: 100
+                    height: 20
+                    text: "打开"
+                    onClicked:
+                    {
+                        file.source=locatee.getValue()
+                        file.openFile()
+                    }
                 }
             }
 
@@ -274,8 +351,8 @@ Window{
             CCheckBox{
                 y:17
                 id:refresh_top
-                scale: 0.75
-                transformOrigin: Item.TopLeft
+                height: 16
+                font.pixelSize: 15
                 text: "刷新显示在最上层"
             }
             CscrollBar{
@@ -314,27 +391,8 @@ Window{
                     text:"毫秒"
                 }
             }
-            Item{
-                y:75
-                CCheckBox{
-                    id:auto_save
-                    height: 16
-                    transformOrigin: Item.TopLeft
-                    font.pixelSize: 15
-                    text:"自动保存"
-                    onCheckedChanged: save()
-                }
-                Timer{
-                    interval: 72000
-                    running: auto_save.checked
-                    onTriggered: {
-                        clock.save()
-                        setting.save()
-                    }
-                }
-            }
             Rectangle{
-                y:97
+                y:75
                 Text{
                     x:2
                     text:"高级显示模式:"
@@ -387,8 +445,19 @@ Window{
             width: parent.width-2
             x:1
             height: 20
-            y:342
+            y:317
             color: $topic_color
+            Cbutton{
+                text:"关于"
+                x:108
+                width: 100
+                height:20
+                onClicked:
+                {
+                    about.visible=true
+                    about.raise()
+                }
+            }
             Cbutton{
                 x:208
                 width: 100

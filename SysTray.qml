@@ -8,58 +8,82 @@ Window{
     width: 0
     height:0
     property var names:[]
-    function ghost(){
-        ghost.checked=!ghost.checked
-    }
-    function add(s_){
-        var menuItem = Qt.createQmlObject(`
-                                          import Qt.labs.platform
-                                          MenuItem {
-                                            property var s
-                                            property string name
-                                            checked:true
-                                            checkable:true
-                                            onCheckedChanged: {
-                                                if(s.ghost)
-                                                {
-                                                    s.ghost=false
-                                                    checked=true
+    property Item paster:Item{
+        function ghost(){
+            ghost.checked=!ghost.checked
+        }
+        function add(s_){
+            var menuItem = Qt.createQmlObject(`
+                                              import Qt.labs.platform
+                                              MenuItem {
+                                                property var s
+                                                property string name
+                                                checked:true
+                                                checkable:true
+                                                onCheckedChanged: {
+                                                    if(s.ghost)
+                                                    {
+                                                        s.ghost=false
+                                                        checked=true
+                                                    }
+                                                    s.visible=checked
                                                 }
-                                                s.visible=checked
-                                            }
-                                          }
-                                          `, menu)
-        menuItem.s=s_
-        var s=String(s_)
-        menuItem.name=s
-        s=(s.indexOf("Paster")>-1?"贴图":"文本")+s.slice(s.indexOf("("),s.length)
-        menuItem.text=s
-        menu_.insertItem(0, menuItem)
+                                              }
+                                              `, menu)
+            menuItem.s=s_
+            var s=String(s_)
+            menuItem.name=s
+            s=s.slice(s.indexOf("("),s.length)
+            menuItem.text=s
+            menu_.insertItem(0, menuItem)
 
-    }
-    function del(s){
-        for(var i=0;i<menu_.items.length;i++)
-            if(menu_.items[i].name==s)
-            {
-                menu_.items[i].destroy()
-                menu_.removeItem(menu_.items[i])
-            }
+        }
+        function del(s){
+            for(var i=0;i<menu_.items.length;i++)
+                if(menu_.items[i].name==s)
+                {
+                    menu_.items[i].destroy()
+                    menu_.removeItem(menu_.items[i])
+                }
 
-    }
-    function sv(s){
-        for(var i=0;i<menu_.items.length;i++)
-            if(menu_.items[i].name==s)
+        }
+        function sv(s){
+            for(var i=0;i<menu_.items.length;i++)
+                if(menu_.items[i].name==s)
+                {
+                    menu_.items[i].checked=!menu_.items[i].checked
+                }
+        }
+        function rename(s,name)
+        {
+            for(var i=0;i<menu_.items.length;i++)
             {
-                menu_.items[i].checked=!menu_.items[i].checked
+                if(menu_.items[i].name==s)
+                    menu_.items[i].text=name
             }
+        }
     }
-    function rename(s,name)
-    {
-        for(var i=0;i<menu_.items.length;i++)
-            if(menu_.items[i].name==s)
-            {
-                menu_.items[i].text=String(menu_.items[i].text).slice(0,1)+name
-            }
+    property Item clock_:Item{
+        function add(s_){
+            var menuItem = Qt.createQmlObject(`
+                                              import Qt.labs.platform
+                                              MenuItem {
+                                                property var s
+                                                onTriggered: s.run()
+                                              }
+                                              `, menu)
+            menuItem.s=s_
+            menuItem.text=menuItem.s.name
+            menu_clock.insertItem(menu_clock.items.length, menuItem)
+        }
+        function del(name){
+            for(var i=0;i<menu_clock.items.length;i++)
+                if(menu_clock.items[i].text==name)
+                {
+                    menu_clock.items[i].destroy()
+                    menu_clock.removeItem(menu_clock.items[i])
+                }
+        }
     }
 
     Platform.SystemTrayIcon {//托盘图标
@@ -67,15 +91,32 @@ Window{
         visible: true
         icon.source: "qrc:/547dt.png"
         onActivated:(reason)=>{
-                        if (reason === Platform.SystemTrayIcon.Context) {
-                            menu.open()
-                        } else {
-                            console.log( Clipboard.pasteText())
-                            pasterLoad.create()
+                        switch(reason){
+                            case Platform.SystemTrayIcon.Context:
+                                menu.open()
+                                break
+                            case Platform.SystemTrayIcon.DoubleClick:
+                                setting.visible=true
+                                setting.raise()
+                                break
+                            case Platform.SystemTrayIcon.MiddleClick:
+                                pasterLoad.shot()
+                                break
+                            case Platform.SystemTrayIcon.Trigger:
+                                console.log( Clipboard.pasteText())
+                                pasterLoad.create()
+                                break
+                            default:
+                                console.log("unkown sysTrayEvent")
                         }
                     }
         menu:Platform.Menu{
             id:menu
+            Platform.MenuItem{
+                text: "截图"
+                onTriggered: pasterLoad.shot()
+            }
+            Platform.MenuSeparator{}
             Platform.MenuItem{
                 text:"547抽号器"
                 icon.source:"qrc:/images/rand.png"
@@ -111,18 +152,11 @@ Window{
                 text: "全部删除"
                 onTriggered: pasterLoad.delA()
             }
-            Platform.MenuItem{
-                text: "截图"
-                onTriggered: pasterLoad.shot()
-            }
             Platform.MenuSeparator{}
-            Platform.MenuItem{
+            Platform.Menu{
                 icon.source:"qrc:/images/clock.png"
-                text:"547clock"
-                onTriggered: {
-                    clock.visible=true
-                    clock.raise()
-                }
+                title:"547clock"
+                id:menu_clock
             }
             Platform.MenuItem{
                 id:ghost
@@ -158,13 +192,6 @@ Window{
                 {
                     setting.save()
                     clock.save()
-                }
-            }
-            Platform.MenuItem{
-                text: "关于"
-                onTriggered:{
-                    about.visible=true
-                    about.raise()
                 }
             }
             Platform.MenuItem{

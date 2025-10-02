@@ -1,5 +1,6 @@
 import QtQuick
 import GFile 1.2
+import EventSender
 
 Window{
     id:root
@@ -21,5 +22,20 @@ Window{
         PasterLoad{ id:pasterLoad }
         About{ id:about }
         Setting{ id:setting }
+    }
+    EventSender{
+        id:eventSender
+        onDataChanged: (data)=>{
+                           switch(data){
+                               case 0:
+                               pasterLoad.shot()
+                               break
+                               case 1:
+                               pasterLoad.create()
+                               break
+                               default:
+                               console.log("unkown mesenge from C++")
+                           }
+                       }
     }
 }

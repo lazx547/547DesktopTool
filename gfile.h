@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QDir>
+#include <QUrl>
 #include <QProcess>
+#include <QDesktopServices>
 
 class GFile : public QObject
 {
@@ -23,6 +25,15 @@ public:
     Q_INVOKABLE qreal getSysScale(){return 0;}
     Q_INVOKABLE QString getDesktop();
     Q_INVOKABLE void start(){program.start(m_source);}
+    Q_INVOKABLE void openFile(){
+        QFileInfo fileInfo(m_source);
+        QUrl fileUrl = QUrl::fromLocalFile(m_source);
+
+        if (!QDesktopServices::openUrl(fileUrl)) {
+            // 处理打开失败的情况
+            qDebug() << "无法打开文件:" << m_source;
+        }
+    }
     Q_INVOKABLE void showPath(){
         QFileInfo fileInfo(m_source);
         qDebug()<<fileInfo.absoluteFilePath();

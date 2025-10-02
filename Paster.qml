@@ -346,7 +346,7 @@ Window {
         visible:false
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
         width: 112
-        height:282
+        height:302
         color:"transparent"
         minimumWidth: 112
         onActiveFocusItemChanged: {//失去焦点时隐藏
@@ -374,7 +374,8 @@ Window {
             y:1
             width: 110
             height: 20
-            text:name
+            text:"文本-"+name+""
+            font.pixelSize: 10
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
@@ -456,7 +457,7 @@ Window {
                     text__.text=text_.text=Clipboard.pasteText()
                     menu_.visible=false
                 }
-            }/*
+            }
             Cbutton{
                 y:top_set.height*6
                 type:1
@@ -494,8 +495,9 @@ Window {
                     }
 
                     onAccepted: {
-
-                        sysTray.rename(name,textInput.text)
+                        menu_.visible=false
+                        pasterLoad.rename(thisn,textInput.text)
+                        name=textInput.text
                         textInput.text = ""
                     }
 
@@ -503,9 +505,9 @@ Window {
                         textInput.text = ""
                     }
                 }
-            }*/
+            }
             Cbutton{
-                y:top_set.height*6
+                y:top_set.height*7
                 type:1
                 width: parent.width
                 text:"自动调整大小"
@@ -526,7 +528,7 @@ Window {
                         gfile.write(text_.text)
                     }
                 }
-                y:top_set.height*7
+                y:top_set.height*8
                 type:1
                 width: parent.width
                 text:"保存为"
@@ -536,7 +538,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*8
+                y:top_set.height*9
                 type:1
                 width: parent.width
                 text:"转换为图片"
@@ -548,7 +550,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*9
+                y:top_set.height*10
                 type:1
                 width: parent.width
                 text:"保存为图片"
@@ -561,7 +563,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*10
+                y:top_set.height*11
                 type:1
                 width: parent.width
                 text: "隐藏"
@@ -571,7 +573,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*11
+                y:top_set.height*12
                 type:1
                 width: parent.width
                 text: "幽灵模式"
@@ -581,7 +583,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*12
+                y:top_set.height*13
                 type:1
                 width: parent.width
                 text: "关闭"

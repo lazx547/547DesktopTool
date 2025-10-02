@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Basic
+import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Dialogs
 import Clipboard 1.0
@@ -192,7 +193,7 @@ Window {
         visible:false
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
         width: 112
-        height:222
+        height:242
         color:"transparent"
         minimumWidth: 112
         onActiveFocusItemChanged: {//失去焦点时隐藏
@@ -219,7 +220,7 @@ Window {
             y:1
             width: 110
             height: 20
-            text:name
+            text:"贴图"+name
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
@@ -301,6 +302,54 @@ Window {
             Cbutton{
                 y:top_set.height*5
                 type:1
+                width: parent.width
+                text:"命名"
+                onClicked: {
+                    inputDialog.open()
+                }
+                Dialog {
+                    id: inputDialog
+                    title: "请输入名称"
+                    anchors.centerIn: parent
+                    modal: true
+                    standardButtons: Dialog.Ok | Dialog.Cancel
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        spacing: 0
+                        Label {
+                            text: "请输入名称:"
+                            Layout.alignment: Qt.AlignLeft
+                        }
+
+                        TextField {
+                            id: textInput
+                            Layout.fillWidth: true
+                            placeholderText: ""
+                            focus: true
+                            onAccepted: {
+                                if (textInput.text.length > 0) {
+                                    inputDialog.accept()
+                                }
+                            }
+                        }
+                    }
+
+                    onAccepted: {
+                        menu_.visible=false
+                        pasterLoad.rename(thisn,textInput.text)
+                        name=textInput.text
+                        textInput.text = ""
+                    }
+
+                    onRejected: {
+                        textInput.text = ""
+                    }
+                }
+            }
+            Cbutton{
+                y:top_set.height*6
+                type:1
                 id:save_bu
                 width: parent.width
                 text:"图片另存为"
@@ -321,7 +370,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*6
+                y:top_set.height*7
                 type:1
                 width: parent.width
                 text:"显示为文字"
@@ -332,7 +381,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*7
+                y:top_set.height*8
                 type:1
                 width: parent.width
                 text: "隐藏"
@@ -343,7 +392,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*8
+                y:top_set.height*9
                 type:1
                 width: parent.width
                 text: "幽灵模式"
@@ -353,7 +402,7 @@ Window {
                 }
             }
             Cbutton{
-                y:top_set.height*9
+                y:top_set.height*10
                 type:1
                 width: parent.width
                 text: "关闭"

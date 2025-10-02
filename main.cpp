@@ -7,6 +7,8 @@
 #include <QSharedMemory>
 #include "clipboardhandler.h"
 #include "delbuttontype.h"
+#include "qhotkey.h"
+#include "eventsender.h"
 
 void clearRelativeDirContents(const QString &relativePath)
 {
@@ -40,14 +42,19 @@ int main(int argc, char *argv[])
     QGuiApplication::setAttribute(Qt::AA_Use96Dpi);
     GFile file;
 
-
     file.setSource("./scale.txt");
+    if(file.is(file.source()))
+        file.write("1");
     QString s=file.read();
     qputenv("QT_SCALE_FACTOR",s.toLatin1());
     QUrl url(QStringLiteral("./file/main.qml"));
+
     QGuiApplication app(argc, argv);
+
+    EventSender *sender = new EventSender(&app);
     app.setWindowIcon(QIcon("qrc:/547dt.png"));
-    QSharedMemory sharedMemory("547DesktopTool_v0.2");
+
+    QSharedMemory sharedMemory("547DesktopTool_v0.3");
     if (sharedMemory.attach()) {
         // 已附加到现有内存段，说明已有实例运行
         QMessageBox::warning(nullptr, "警告", "程序已经在运行中");
@@ -58,7 +65,10 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, "错误", "无法创建共享内存段");
         return 1;
     }
-    QApplication* app2=new QApplication(argc, argv);
+
+
+    QApplication* app2=new QApplication(argc, argv);//看似没用，删就报错（其实是MessengeBox使用的，不在main函数中）
+    qmlRegisterType<EventSender>("EventSender",1,2,"EventSender");
     qmlRegisterType<GFile>("GFile",1,2,"GFile");
     qmlRegisterSingletonType<ClipboardHandler>(
         "Clipboard", 1, 0, "Clipboard",
@@ -89,6 +99,52 @@ int main(int argc, char *argv[])
     else
     {
         engine.load(url);
+    }
+    QObject *rootObject = engine.rootObjects().first();
+    if (!rootObject) {
+        qWarning() << "No root object found!";
+    }
+    QObject *eventSender = rootObject->findChild<QObject*>("eventSender");
+    if (!eventSender) {
+        auto allObjects = rootObject->findChildren<QObject*>();
+        for (auto obj : std::as_const(allObjects)) {
+            if (obj->inherits("EventSender")) {
+                eventSender = obj;
+                qDebug() << "Found EventSender";
+                break;
+            }
+        }
+    }
+    file.setSource("./hotkey.ini");
+    QString shot,paster;
+    s=file.read();
+    if(s=="")
+    {
+        s="Ctrl+Alt+S,Ctrl+Alt+P,";
+        file.write(s);
+    }
+    shot=s.mid(0,s.indexOf(","));
+    s=s.mid(s.indexOf(",")+1,s.length());
+    if(s=="")
+    {
+        s="Ctrl+Alt+P,";
+        file.write(s);
+    }
+    paster=s.mid(0,s.indexOf(","));
+    QHotkey *hotkey_shot = new QHotkey(QKeySequence(shot), true, &app),
+        *hotkey_paster =new QHotkey(QKeySequence(paster), true, &app);
+
+    // Connect the activated signal
+    QObject::connect(hotkey_shot, &QHotkey::activated,[eventSender]() {
+        QMetaObject::invokeMethod(eventSender, "send", Q_ARG(QVariant, 0));
+    });
+
+    QObject::connect(hotkey_paster, &QHotkey::activated, [eventSender]() {
+        QMetaObject::invokeMethod(eventSender, "send", Q_ARG(QVariant, 1));
+    });
+    // Check if registration was successful
+    if (!hotkey_shot->isRegistered()||!hotkey_paster->isRegistered()) {
+        QMessageBox::warning(nullptr, "Error", "Failed to register hotkey!");
     }
     return app.exec();
 }
