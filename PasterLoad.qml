@@ -10,6 +10,10 @@ Item {
     property var shoter:Qt.createComponent("./ScreenShot.qml")
     property var shotObj
     property var objs:[]
+    function read(){
+        file.source="./"
+    }
+
     function create(){
         if(!Clipboard.isEmpty()){
             console.log("ts:"+Clipboard.showType())

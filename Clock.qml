@@ -963,10 +963,11 @@ Window{
                         x:3
                         onColor_Changed: window.font_color=color_
                     }
-                    ComboBox {
+                    GComboBox {
                         id: font_combo
                         x:3
                         y:100
+                        width: 120
                         height: 20
                         transformOrigin: Item.TopLeft
                         model: Qt.fontFamilies()

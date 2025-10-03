@@ -74,7 +74,7 @@ Item{
 
         MouseArea {
             anchors.fill: parent
-
+            enabled: root.enabled
             function handleCursorPos(x) {
                 let halfWidth = slider.width * 0.5;
                 slider.x = Math.max(0, Math.min(width, x + halfWidth) - slider.width);

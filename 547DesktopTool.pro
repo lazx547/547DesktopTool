@@ -18,7 +18,9 @@ RC_FILE += 547dt.rc
 SOURCES += \
         clipboardhandler.cpp \
         gfile.cpp \
-        main.cpp
+        main.cpp \
+        qhotkey.cpp \
+        qhotkey_win.cpp
 
 RESOURCES += \
     1.qrc
@@ -37,7 +39,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     clipboardhandler.h \
     delbuttontype.h \
-    gfile.h
+    eventsender.h \
+    gfile.h \
+    qhotkey.h \
+    qhotkey_p.h
 
 VERSION = 0.9
 
@@ -53,7 +58,9 @@ DISTFILES += \
     CscrollBar.qml \
     DelButton.qml \
     DelIconButton.qml \
+    GComboBox.qml \
     GMesenger.qml \
+    GWindow.qml \
     ImaButton.qml \
     ImagePaster.qml \
     Paster.qml \
@@ -61,6 +68,8 @@ DISTFILES += \
     Rand.qml \
     Rand_bar.qml \
     ScreenShot.qml \
+    Setting.qml \
     SourceItem.qml \
     SysTray.qml \
+    Watermark.qml \
     main.qml

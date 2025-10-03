@@ -85,6 +85,18 @@ Window{
                 }
         }
     }
+    property Item watermark_:Item{
+        function reset(i,t){
+            if(i){
+                if(t)
+                    watermark1.checked=true
+                else
+                    watermark2.checked=true
+            }
+            else
+                watermark.reset(false,true)
+        }
+    }
 
     Platform.SystemTrayIcon {//托盘图标
         id:sysTray
@@ -112,9 +124,43 @@ Window{
                     }
         menu:Platform.Menu{
             id:menu
-            Platform.MenuItem{
-                text: "截图"
-                onTriggered: pasterLoad.shot()
+            Platform.Menu{
+                title: "工具"
+                Platform.MenuItem{
+                    text: "截图"
+                    onTriggered: pasterLoad.shot()
+                }
+                Platform.MenuItem{
+                    text: "复制时间"
+                    onTriggered: setting.copyTime()
+                }
+                Platform.MenuSeparator{}
+                Platform.MenuItem{
+                    id:watermark1
+                    text: "伪造激活水印"
+                    checkable: true
+                    onCheckedChanged: {
+                        if(checked){
+                            watermark2.checked=false
+                            watermark.reset(true,true)
+                        }
+                        else if(!watermark2.checked)
+                            watermark.reset(false,true)
+                    }
+                }
+                Platform.MenuItem{
+                    id:watermark2
+                    text: "已激活水印"
+                    checkable: true
+                    onCheckedChanged: {
+                        if(checked){
+                            watermark1.checked=false
+                            watermark.reset(true,false)
+                        }
+                        else if(!watermark1.checked)
+                            watermark.reset(false,true)
+                    }
+                }
             }
             Platform.MenuSeparator{}
             Platform.MenuItem{

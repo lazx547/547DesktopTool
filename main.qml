@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import GFile 1.2
 import EventSender
 
@@ -22,6 +23,7 @@ Window{
         PasterLoad{ id:pasterLoad }
         About{ id:about }
         Setting{ id:setting }
+        Watermark{ id:watermark }
     }
     EventSender{
         id:eventSender
@@ -32,6 +34,9 @@ Window{
                                break
                                case 1:
                                pasterLoad.create()
+                               break
+                               case 2:
+                               setting.copyTime()
                                break
                                default:
                                console.log("unkown mesenge from C++")

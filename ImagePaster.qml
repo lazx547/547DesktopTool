@@ -79,6 +79,29 @@ Window {
             resize()
         }
     }
+    Window{
+        id:scale_text_window
+        visible: false
+        flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
+        width: scale_text.width
+        height: scale_text.height
+        x:window.x
+        y:window.y
+        function show(){
+            visible=true
+            scale_text_timer.running=false
+            scale_text_timer.running=true
+        }
+        Text{
+            id:scale_text
+            text: "大小:"+parseInt(win.scale*100)+"%"
+        }
+        Timer{
+            id:scale_text_timer
+            interval: 2000
+            onTriggered: scale_text_window.visible=false
+        }
+    }
 
     MouseArea {
         anchors.fill: parent
@@ -106,6 +129,7 @@ Window {
                             else win.scale=50/width_
                         }
                         resize()
+                        scale_text_window.show()
                     }
                 }
         onPressed: (mouse)=>{

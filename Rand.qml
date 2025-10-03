@@ -5,32 +5,29 @@ import GFile
 import QtQuick.Dialogs
 import QtQuick.Controls.Basic
 
-Window {
+GWindow {
     id: window
     flags: Qt.FramelessWindowHint|Qt.Window
     visible:false
     width: 584
     height: 334
-    color: "#00000000"
     title: "547抽号器"
+    image:"qrc:/images/rand.png"
     x:window.screen.width/2-width/2
     y:window.screen.height/2-height/2
     property int sumn:0//所抽的序号
     property int nummm: 1
     property int sim
     property int cclass:0
-    property var a:[]
+    property var a:[]//名单
+    property var names:[]
     property var clas:[]
     property var num_xh:[]
-    property var clas_name:[]
-    property var clas_objs:[]
+    property var clas_name:[]//班级名称
+    property var clas_objs:[]//班级选择对象
     property var obj:Qt.createComponent("./SourceItem.qml")
 
-    property int thisn
-    property int thistype
-    property string path:"."
-    property int thisnum
-
+    onVisibleChanged: if(visible)  mesenge.show("已找到"+clas.length+"个班级"+",已选择\""+clas_name[cclass]+"\"",3000)
     onCclassChanged:
     {
         reEnable()
@@ -55,13 +52,11 @@ Window {
     Component.onCompleted:  {
         load()
     }
-    onThisnumChanged:
-        title="547抽号器("+thisnum+")"
     function load(){
-        file.source=path+"/source/.ini"
-        if(file.is(path+"/source/.ini"))
+        file.source="./source/.ini"
+        if(file.is("./source/.ini"))
         {
-            file.source=path+"/source/.ini"
+            file.source="./source/.ini"
             var s=file.read()
             var i=0,l=s.length,j=0,k,p
             do
@@ -75,7 +70,7 @@ Window {
             clas.pop()
             for(k=0;k<clas.length;k++)
             {
-                file.source=path+"/source/"+clas[k]+".ini"
+                file.source="./source/"+clas[k]+".ini"
                 s=file.read()
                 clas_name.push(s.slice(0,s.indexOf(",")))
                 i=s.indexOf(",")+1
@@ -115,28 +110,40 @@ Window {
             cn.enabled=false
         }
     }
-
-    function cou(){
-        var a=coul()
+    function cou(n=0){
+        var a=coul(n)
         if(xh.checked)
             a=a.slice(0,num_xh[cclass])
         else if(mz.checked)
             a=a.slice(num_xh[cclass],a.length)
         return a
     }
+    function coul(n=0){
+        var b;
+        if(n===0){
+            b=Math.floor(Math.random() * a[cclass].length)
+            return a[cclass][b]
+        }
+        else{
 
-    function coul(){
-        var b=Math.floor(Math.random() * a[cclass].length)
-        return a[cclass][b]
+            b=Math.floor(Math.random() * names.length)
+            var s=names[b]
+            for(var i=b;i<names.length-1;i++)
+            {
+                names[i]=names[i+1]
+            }
+            names.pop()
+            return s
+        }
     }
-    Window {
+    GWindow {
         id: win_s
         flags: Qt.FramelessWindowHint|Qt.Window
         visible:false
         width: 304
         height: 334
-        color: "#00000000"
         title: window.title+">设置"
+        image:"qrc:/images/rand.png"
         GMesenger{
             id:mesenge2
             z:46578
@@ -148,85 +155,21 @@ Window {
                     mesenge2.enabled=false
             }
         }
-        Rectangle{
-            anchors.fill: parent
-            border.color: "#80808080"
-            border.width: 2
-        }
         Item{
+            y:20
             x:2
-            y:2
-            Rectangle{
-                width: win_s.width-4
-                height: 30
-                color:"#BBBBBB"
-                Image{
-                    source:"qrc:/images/rand.png"
-                    width: 30
-                    height: 30
-                }
-                Text{
-                    x:32
-                    y:2
-                    text:window.title+">设置"
-                    font.pixelSize: 20
-                }
-                DelButton{
-                    x:win_s.width-36
-                    y:-3
-                    width: 30
-                    height: 30
-                    text: "×"
-                    colorBg: "#00000000"
-                    colorBorder: "#00000000"
-                    font.pixelSize: 30
-                    padding: 0
-                    type:6
-                    topPadding: 8
-                    onClicked: {
-                        win_s.visible=false
-                    }
-                }
-                Item{
-                    width: win_s.width-36
-                    height: 30
-                    MouseArea {
-                        anchors.fill: parent
-                        property int dragX
-                        property int dragY
-                        property bool dragging
-                        onPressed: {
-                            dragX = mouseX
-                            dragY = mouseY
-                            dragging = true
-                        }
-                        onReleased: {
-                            dragging = false
-                        }
-                        onPositionChanged: {
-                            if (dragging) {
-                                win_s.x += mouseX - dragX
-                                win_s.y += mouseY - dragY
-                            }
-                        }
-                    }
-                }
-            }
-            Item{
-                y:30
-                ScrollView{
-                    id:clasItem_sv
+            ScrollView{
+                id:clasItem_sv
+                transformOrigin: Item.TopLeft
+                width: 600
+                height: 620
+                scale:0.5
+                ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                Rectangle{
                     transformOrigin: Item.TopLeft
-                    width: 600
-                    height: 600
-                    scale:0.5
-                    ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-                    Rectangle{
-                        transformOrigin: Item.TopLeft
-                        id:clasItem
-                        scale: 2
-                        width: 300
-                    }
+                    id:clasItem
+                    scale: 2
+                    width: 300
                 }
             }
         }
@@ -242,13 +185,6 @@ Window {
                 mesenge.enabled=false
         }
     }
-
-    MouseArea{
-        anchors.fill: parent
-        z:-1
-        onClicked: mesenge.enabled=false
-    }
-
     GFile{
         id:file
         function save(){
@@ -257,360 +193,208 @@ Window {
             mesenge.show("已导出到"+source,5000)
         }
     }
+    Cbutton{
+        x:window.width-80
+        width: 50
+        height: 20
+        text: "设置"
+        font.pixelSize: 15
+        colorBg: "#00000000"
+        colorBorder: "#00000000"
+        padding: 0
+        topPadding: 0
+        onClicked: {
+            if(!win_s.visible)
+            {
+                win_s.x=window.x+window.width
+                win_s.y=window.y
+            }
 
+            win_s.visible=true
+        }
+    }
     Rectangle{
-        anchors.fill: parent
-        border.color: "#80808080"
-        border.width: 2
+        x:10
+        y:40
+        width: 330
+        height: 280
+        color: "#E8E8E8"
+        ScrollView {
+            id:output__
+            anchors.fill: parent
+            TextEdit {
+                x:(output__.parent.width-width)/2
+                width: contentWidth
+                id:output
+                text: ""
+                horizontalAlignment: Text.Center
+                font.pixelSize: 30
+                color: "black"
+                onFocusChanged: mesenge.enabled=false
+            }
+            ScrollBar.vertical: ScrollBar {
+                id:output_
+                height: parent.height
+                policy: output__.contentHeight>output__.height?ScrollBar.AlwaysOn:ScrollBar.AlwaysOff
+                x:parent.width-output_.width
+            }
+        }
     }
     Item{
-        x:2
-        y:2
-        Rectangle{
-            width: window.width-4
+        x:350
+        y:48
+        width: 280
+        height: 80
+        MouseArea{
+            anchors.fill: parent
+            z:-1
+            onClicked: mesenge.enabled=false
+        }
+        Cbutton{
+            id:c1
+            x:0
+            y:0
+            width: 100
             height: 30
-            color:"#BBBBBB"
-            Image{
-                source:"qrc:/images/rand.png"
-                width: 30
-                height: 30
-            }
-            Text{
-                x:32
-                y:2
-                text:window.title
-                font.pixelSize: 20
-            }
-            DelButton{
-                x:window.width-121
-                width: 50
-                height: 30
-                y:3
-                text: "设置"
-                font.pixelSize: 20
-                colorBg: "#00000000"
-                colorBorder: "#00000000"
-                padding: 0
-                topPadding: 0
-                onClicked: {
-                    win_s.visible=true
-                }
-            }
-            DelButton{
-                x:window.width-66
-                y:-3
-                width: 30
-                height: 30
-                text: "-"
-                font.pixelSize: 30
-                colorBg: "#00000000"
-                colorBorder: "#00000000"
-                padding: 0
-                topPadding: 8
-                onClicked: {
-                    window.visibility=Window.Minimized
-                }
-            }
-            DelButton{
-                x:window.width-36
-                y:-3
-                width: 30
-                height: 30
-                text: "×"
-                colorBg: "#00000000"
-                colorBorder: "#00000000"
-                font.pixelSize: 30
-                padding: 0
-                type:6
-                topPadding: 8
-                onClicked: {
-                    window.visible=false
-                }
-            }
-            Item{
-                width: window.width-121
-                height: 30
-                MouseArea {
-                    anchors.fill: parent
-                    property int dragX
-                    property int dragY
-                    property bool dragging
-                    onPressed: {
-                        dragX = mouseX
-                        dragY = mouseY
-                        dragging = true
-                    }
-                    onReleased: {
-                        dragging = false
-                    }
-                    onPositionChanged: {
-                        if (dragging) {
-                            window.x += mouseX - dragX
-                            window.y += mouseY - dragY
-                        }
-                    }
-                }
-            }
-
-
-        }
-
-        Rectangle{
-            x:10
-            y:40
-            width: 330
-            height: 280
-            color: "#E8E8E8"
-            ScrollView {
-                anchors.fill: parent
-                TextArea {
-                    property string tex:""
-                    onTexChanged: {
-                        text=tex
-                    }
-                    onTextChanged: {
-                        text=tex
-                    }
-                    id:output
-                    text: ""
-                    horizontalAlignment: Text.Center
-                    font.pixelSize: 30
-                    color: "black"
-                    background: Rectangle{
-                        color: "#E8E8E8"
-                        x:0
-                        y:0
-                        width: 280
-                        height: 280
-                    }
-                    onFocusChanged: mesenge.enabled=false
-                }
+            text: "抽一次"
+            font.pixelSize: 20
+            onClicked: {
+                sumn++
+                output.text+=(sumn==1?"":"\n")+"["+sumn+"]"+cou()
+                if(output__.contentHeight>output__.height)output_.position=(output__.contentHeight-output__.height)/output__.contentHeight
             }
         }
-        Item{
-            x:350
-            y:48
-            width: 280
-            height: 80
-            MouseArea{
-                anchors.fill: parent
-                z:-1
-                onClicked: mesenge.enabled=false
-            }
-            DelButton{
-                id:c1
-                x:0
-                y:0
-                width: 100
-                height: 30
-                text: "抽一次"
-                font.pixelSize: 20
-                onClicked: {
-                    sumn++
-                    output.tex="["+sumn+"]"+cou()+"\n"+output.tex
-                }
-            }
-            DelButton{
-                id:cn
-                x:120
-                y:0
-                width: 100
-                height: 30
-                text: "抽n次"
-                font.pixelSize: 20
-                onClicked: {
-                    if(nummm>0)
-                        for(var i=0;i<nummm;i++)
+        Cbutton{
+            id:cn
+            x:120
+            y:0
+            width: 100
+            height: 30
+            text: "抽n次"
+            font.pixelSize: 20
+            onClicked: {
+                if(n.value>0)
+                {
+                    var i=0
+                    for(i=0;i<names.length;i++)
+                        names.pop()
+                    for(i=0;i<a[cclass].length;i++)
+                        names.push(a[cclass][i])
+                    if(n.value<=names.length)
+                    {
+                        n.enabled=false
+                        for(i=0;i<n.value;i++)
                         {
                             sumn++
-                            output.tex="["+sumn+"]"+cou()+"\n"+output.tex
+                            output.text+=(sumn==1?"":"\n")+"["+sumn+"]"+cou()
                         }
+                        n.enabled=true
+                        if(output__.contentHeight>output__.height)output_.position=(output__.contentHeight-output__.height)/output__.contentHeight
+                    }
+                    else
+                        mesenge.show("n不能大于班级总人数",3000)
                 }
             }
-            Text{
-                y:40
-                font.pixelSize: 20
-                text:"n="
-            }
+        }
+        Text{
+            y:40
+            font.pixelSize: 20
+            text:"n="
+        }
 
-            CscrollBar{
-                y:45
-                x:30
-                text_width: 0
-                id:sb
-                onValueChanged: nummm=value
-                height: 20
-                maxValue: 50
-                Component.onCompleted: setValue(1)
-                width: 190
+        CscrollBar{
+            id:n
+            y:45
+            x:30
+            text_width: 0
+            height: 20
+            maxValue: 50
+            Component.onCompleted: setValue(1)
+            width: 190
+        }
+        Cbutton{
+            x:0
+            y:80
+            width: 100
+            height:30
+            text: "清除"
+            font.pixelSize: 20
+            onClicked: {
+                output.text=""
+                sumn=0
             }
-            DelButton{
-                x:0
-                y:80
-                width: 100
-                height:30
-                text: "清除"
-                font.pixelSize: 20
-                onClicked: {
-                    output.tex=""
-                    sumn=0
-                }
-            }
-            DelButton{
-                x:120
-                y:80
-                width: 100
-                height:30
-                text: "导出"
-                font.pixelSize: 20
-                onClicked: file.save()
-            }
-            Rectangle{
-                x:0
-                y:130
-                width: parent.width-60
-                height: 130
-                border.color: "#80808080"
-                radius: 3
-                MouseArea{
-                    anchors.fill: parent
-                    z:-1
-                    onClicked: mesenge.enabled=false
-                }
-                DelButton{
-                    id:qb
-                    width: parent.width-20
-                    height: 25
-                    x:10
-                    y:35
-                    checkable: true
-                    type: checked ? 3 : 1
-                    text: "显示学号和名字"
-                    checked: true
-                    onCheckedChanged: {
-                        if(checked)
-                        {
-                            xh.checked=false
-                            mz.checked=false
-                        }
-                    }
-                    onClicked: checked=true
-                }
-                DelButton{
-                    id:xh
-                    width: parent.width-20
-                    height: 25
-                    x:10
-                    y:65
-                    checkable: true
-                    text: "只显示学号"
-                    type: checked ? 3 : 1
-                    onCheckedChanged: {
-                        if(checked)
-                        {
-                            qb.checked=false
-                            mz.checked=false
-                        }
-                    }
-                    onClicked: checked=true
-                }
-                DelButton{
-                    id:mz
-                    width: parent.width-20
-                    height: 25
-                    x:10
-                    y:95
-                    checkable: true
-                    type: checked ? 3 : 1
-                    text: "只显示名字"
-                    onCheckedChanged: {
-                        if(checked)
-                        {
-                            xh.checked=false
-                            qb.checked=false
-                        }
-                    }
-                    onClicked: checked=true
-                }
-                DelButton{
-                    text:"关于"
-                    font.pixelSize: 16
-                    width: 60
-                    x:parent.width-width-10
-                    y:8
-                    height: 20
-                    onClicked: about.visible=true
-                    Window{
-                        id:about
-                        width: 300
-                        height: 190
-                        minimumHeight: height
-                        maximumHeight: height
-                        minimumWidth: width
-                        maximumWidth: width
-                        Image {
-                            x:20
-                            y:10
-                            width: 70
-                            height: 70
-                            source: "./images/Qt.png"
-                        }
-                        Text{
-                            x:90
-                            y:25
-                            font.pixelSize: 20
-                            text:"Made with Qt6"
-                        }
-                        Text {
-                            x:90
-                            y:45
-                            text: "(Desktop Qt 6.7.3 MinGW 64-bit)"
-                        }
-                        DelButton{
-                            text:"源代码"
-                            font.pixelSize: 16
-                            width: 80
-                            x:30
-                            y:80
-                            height: 20
-                            onClicked: Qt.openUrlExternally("https://github.com/lazx547/547choice")
-                        }
-                        DelButton{
-                            text:"547官网"
-                            font.pixelSize: 16
-                            width: 100
-                            x:170
-                            y:80
-                            height: 20
-                            onClicked: Qt.openUrlExternally("https://lazx547.github.io")
-                        }
-                        Rectangle{
-                            border.color: "#80808080"
-                            border.width: 1
-                            radius: 4
-                            x:20
-                            y:110
-                            width: parent.width-40
-                            height: 60
-                            Text{
-                                text:"使用的开源组件:DelButton"
-                                x:10
-                                y:5
-                                font.pixelSize: 16
-                            }
-                            DelButton{
-                                x:80
-                                y:30
-                                text:"访问仓库"
-                                width: 100
-                                height: 20
-                                onClicked: Qt.openUrlExternally("https://github.com/mengps/QmlControls/tree/master/DelButton")
-                            }
-                        }
+        }
+        Cbutton{
+            x:120
+            y:80
+            width: 100
+            height:30
+            text: "导出"
+            font.pixelSize: 20
+            onClicked: file.save()
+        }
+        Rectangle{
+            x:0
+            y:130
+            width: parent.width-60
+            height: 100
+            border.color: "#80808080"
+            color: "#00000000"
+            CCheckBox{
+                id:qb
+                width: parent.width-20
+                height: 25
+                x:10
+                y:5
+                text: "显示学号和名字"
+                font.pixelSize:15
+                checkable: false
+                checked: true
+                onClicked: checked=!checked
+                onCheckedChanged: {
+                    if(checked)
+                    {
+                        xh.checked=false
+                        mz.checked=false
                     }
                 }
             }
-
+            CCheckBox{
+                id:xh
+                width: parent.width-20
+                height: 25
+                x:10
+                y:35
+                text: "只显示学号"
+                font.pixelSize: 15
+                checkable: false
+                onClicked: checked=!checked
+                onCheckedChanged: {
+                    if(checked)
+                    {
+                        qb.checked=false
+                        mz.checked=false
+                    }
+                }
+            }
+            CCheckBox{
+                id:mz
+                width: parent.width-20
+                height: 25
+                x:10
+                y:65
+                text: "只显示名字"
+                font.pixelSize: 15
+                checkable: false
+                onClicked: checked=!checked
+                onCheckedChanged: {
+                    if(checked)
+                    {
+                        xh.checked=false
+                        qb.checked=false
+                    }
+                }
+            }
         }
 
     }

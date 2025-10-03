@@ -13,7 +13,7 @@ Window {
     minimumWidth: 100
     minimumHeight: 50
     flags: {
-        var r=Qt.FramelessWindowHint
+        var r=Qt.FramelessWindowHint|Qt.Window|Qt.Tool
         r|=top?Qt.WindowStaysOnTopHint:null
         r|=ghost?Qt.WindowTransparentForInput:null
         return r
@@ -226,23 +226,49 @@ Window {
         }
     }
     Rectangle{
+        DropArea {
+            anchors.fill: parent
+            onEntered: {
+                drop_cover.visible=true
+            }
+            onExited: {
+                drop_cover.visible=false
+            }
+            onDropped: (drop)=>{
+                           drop_cover.visible=false
+                           var a=drop.text
+                           text__.text=text_.text=a
+                           resize(a)
+                       }
+        }
+        Rectangle{
+            z:200
+            id:drop_cover
+            anchors.fill: parent
+            color: "#80808080"
+            visible: false
+            Text{
+                anchors.centerIn: parent
+                text:"松开鼠标以粘贴"
+                font.pixelSize: 20
+                color: topic_color
+            }
+        }
+
         Text {
+            id: metrics
+            font: font_
             visible: false
             onTextChanged: {
                 var a=sys_width
                 window.width=metrics.width+border_size.value*2+2
-                console.log(border_size.value)
                 if(window.width>sys_width)
                 {
                     window.width=a
                     window.height=text_.height+border_size.value*2
                 }
                 window.height=metrics.height+border_size.value*2
-                console.log(width+":"+height)
-                console.log(window.width+":"+window.height)
             }
-            id: metrics
-            font: font_
         }
 
         id:win
@@ -319,6 +345,7 @@ Window {
             horizontalAlignment: Text.AlignHCenter
             font:font_
             wrapMode: Text.Wrap
+            selectByMouse: true
             padding: 0
             leftPadding: 0
             rightPadding: 0
@@ -876,11 +903,12 @@ Window {
                         color:"#f2f2f2"
                         border.color: window.topic_color
                     }
-                    ComboBox {
+                    GComboBox {
                         id: font_combo
                         x:3
-                        y:1
+                        y:2
                         height: 20
+                        width: 160
                         transformOrigin: Item.TopLeft
                         model: Qt.fontFamilies()
                         currentIndex: model.indexOf(window.font_.family)
