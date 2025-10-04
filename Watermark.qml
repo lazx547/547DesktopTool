@@ -1,5 +1,5 @@
 import QtQuick
-
+import Qt5Compat.GraphicalEffects
 
 Window{
     flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint|Qt.WindowTransparentForInput
@@ -10,23 +10,44 @@ Window{
     y:root.screen.height*0.85
     width:text_.width
     height: text.height+text_.height
-    opacity: 0.9
+    opacity: 0.5
     property bool type:false
     function reset(i,t){
         visible=i
         type=t
     }
 
+    DropShadow {
+        anchors.fill: text
+        horizontalOffset: 1
+        verticalOffset: 1
+        radius: 2.0
+        samples: 17
+        color: "#30000000"
+        source: text
+    }
+
+    DropShadow {
+        anchors.fill: text_
+        horizontalOffset: 1
+        verticalOffset: 1
+        radius: 2.0
+        samples: 17
+        color: "#30000000"
+        source: text_
+    }
+
     Text{
+        z:2
         id:text
-        color:"#8f8f8f"
+        color:"#dfdfdf"
         font.pixelSize: 25
         text:type?"激活 Windows":"Windows 已激活"
     }
     Text{
         y:text.height
         id:text_
-        color:"#8f8f8f"
+        color:"#dfdfdf"
         font.pixelSize: 20
         text:type?"转到\"设置\"以激活 Windows":"转到\"设置\"以取消激活 Windows"
     }

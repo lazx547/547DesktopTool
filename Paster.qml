@@ -21,6 +21,8 @@ Window {
     color: "#00000000"
     visible: false
     
+    property real lastScaleW
+    property real lastScaleH
     readonly property real sys_width: window.screen.width
     readonly property real sys_height: window.screen.height
     property int bw: border_size>3?border_size:3
@@ -127,6 +129,18 @@ Window {
         read()
         window.visible=true
     }
+    onWidthChanged: {
+        if(lastScaleW!=win.scale)
+            lastScaleW=win.scale
+        else
+            win.width=window.width/win.scale
+    }
+    onHeightChanged: {
+        if(lastScaleH!=win.scale)
+            lastScaleH=win.scale
+        else
+            win.height=window.height/win.scale
+    }
 
     function save(){
         var a=window.width+","
@@ -225,6 +239,31 @@ Window {
             file.write(a)
         }
     }
+
+    Window{
+        id:scale_text_window
+        visible: false
+        flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
+        width: scale_text.width
+        height: scale_text.height
+        x:window.x
+        y:window.y
+        function show(){
+            visible=true
+            scale_text_timer.running=false
+            scale_text_timer.running=true
+        }
+        Text{
+            id:scale_text
+            text: "大小:"+parseInt(win.scale*100)+"%"
+        }
+        Timer{
+            id:scale_text_timer
+            interval: 2000
+            onTriggered: scale_text_window.visible=false
+        }
+    }
+
     Rectangle{
         DropArea {
             anchors.fill: parent
@@ -261,18 +300,18 @@ Window {
             visible: false
             onTextChanged: {
                 var a=sys_width
-                window.width=metrics.width+border_size.value*2+2
+                window.width=metrics.width+border_size.value*2+2*win.scale
                 if(window.width>sys_width)
                 {
-                    window.width=a
-                    window.height=text_.height+border_size.value*2
+                    window.width=a*win.scale
+                    window.height=(text_.height+border_size.value*2)*win.scale
                 }
-                window.height=metrics.height+border_size.value*2
+                window.height=(metrics.height+border_size.value*2)*win.scale
             }
         }
 
+        transformOrigin: Item.TopLeft
         id:win
-        anchors.fill: parent
         color:back_color
         border.color: border_color
         border.width: custom.visible?(border_width==0 ?3:border_width):border_width
@@ -282,7 +321,7 @@ Window {
             z:2
             cursorShape: {
                 const p = Qt.point(mouseX, mouseY);
-                const b = bw; // Increase the corner size slightly
+                const b = bw;
                 if (p.x < b && p.y < b) return Qt.SizeFDiagCursor;
                 if (p.x >= width - b && p.y >= height - b) return Qt.SizeFDiagCursor;
                 if (p.x >= width - b && p.y < b) return Qt.SizeBDiagCursor;
@@ -292,10 +331,24 @@ Window {
             }
             acceptedButtons: Qt.LeftButton|Qt.RightButton
 
+            onWheel:(wheel)=>{
+                        if(!lock)
+                        {
+                            if(wheel.angleDelta.y>0) win.scale+=0.05
+                            else if(wheel.angleDelta.y<0)
+                            {
+                                if(window.width>100)  win.scale-=0.05
+                                else win.scale=50/win.width
+                            }
+                            window.width=win.width*win.scale
+                            window.height=win.height*win.scale
+                            scale_text_window.show()
+                        }
+                    }
             onPressed: (mouse)=>{
                            if(!lock){
                                const p = mouse
-                               const b = bw; // Increase the corner size slightly
+                               const b = bw;
                                let e = 0;
                                if (mouse.x < b) { e = Qt.LeftEdge }
                                if (mouse.x >= width - b) { e |= Qt.RightEdge }
@@ -317,8 +370,8 @@ Window {
                             dragging = false
                             if(window.x==x0 && window.y==y0 && mouse.button==Qt.RightButton)
                             {
-                                menu_.x=window.x+mouseX
-                                menu_.y=window.y+mouseY
+                                menu_.x=window.x+mouseX*win.scale
+                                menu_.y=window.y+mouseY*win.scale
                                 if(menu_.x+menu_.width>sys_width) menu_.x-=menu_.width
                                 if(menu_.y+menu_.height>sys_height) menu_.y-=menu_.height
                                 menu_.visible=true
@@ -337,8 +390,8 @@ Window {
             z:3
             x:border_width
             y:border_width
-            width: window.width-2*border_width
-            height: window.height-2*border_width
+            width: win.width-2*border_width
+            height: win.height-2*border_width
             visible: custom.visible
             id:text__
             color:font_color
@@ -354,8 +407,8 @@ Window {
         Item{
             x:border_width
             y:border_width
-            width: window.width-2*border_width
-            height: window.height-2*border_width
+            width: win.width-2*border_width
+            height: win.height-2*border_width
             Text{
                 id:text_
                 anchors.fill: parent
@@ -583,7 +636,7 @@ Window {
                 text:"保存为图片"
                 onClicked: {
                     menu_.visible=false
-                    window.grabToImage(function(result) {
+                    win.grabToImage(function(result) {
                         console.log(result)
                         Clipboard.saveAs(result.image)
                     });

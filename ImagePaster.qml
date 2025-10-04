@@ -11,7 +11,7 @@ Window {
     minimumWidth: 20
     minimumHeight: 20
     flags: {
-        var r=Qt.FramelessWindowHint
+        var r=Qt.FramelessWindowHint|Qt.Window|Qt.Tool
         r|=top?Qt.WindowStaysOnTopHint:null
         r|=ghost?Qt.WindowTransparentForInput:null
         return r
@@ -47,6 +47,37 @@ Window {
         id:file
     }
 
+    DropArea {
+        anchors.fill: parent
+        onEntered: {
+            drop_cover.visible=true
+        }
+        onExited: {
+            drop_cover.visible=false
+        }
+        onDropped: (drop)=>{
+                       drop_cover.visible=false
+                       var s=String(drop.text)
+                       if(image.source!=s)
+                       {
+                           image.last=image.source
+                           image.source=s
+                       }
+                   }
+    }
+    Rectangle{
+        z:200
+        id:drop_cover
+        anchors.fill: parent
+        color: "#80808080"
+        visible: false
+        Text{
+            anchors.centerIn: parent
+            text:"松开鼠标以粘贴"
+            font.pixelSize: 20
+            color: $topic_color
+        }
+    }
     onThisnChanged: {
         if(path!="-1")
         {
@@ -164,7 +195,6 @@ Window {
                             if(menu_.y+menu_.height>sys_height) menu_.y-=menu_.height
                             menu_.visible=true
                         }
-
                     }
         onPositionChanged: {
             if (dragging) {
@@ -196,6 +226,8 @@ Window {
                 }
                 else if(status==Image.Ready)
                 {
+                    image.width=sourceSize.width*win.scale
+                    image.height=image.width*sourceSize.height/sourceSize.width
                     console.log("IP:ok")
                     width/=dpr
                     height/=dpr
@@ -244,7 +276,8 @@ Window {
             y:1
             width: 110
             height: 20
-            text:"贴图"+name
+            text:"贴图-"+name
+            font.pixelSize: 10
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }

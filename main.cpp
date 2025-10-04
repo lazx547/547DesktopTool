@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     QApplication* app2=new QApplication(argc, argv);
 
     //使用共享内存段确保只有一个程序实例运行
-    QSharedMemory sharedMemory("547DesktopTool_v0.5");
+    QSharedMemory sharedMemory("547DesktopTool");
     if (sharedMemory.attach()) {
         // 已附加到现有内存段，说明已有实例运行
         QMessageBox::warning(nullptr, "错误", "程序已经在运行中");
