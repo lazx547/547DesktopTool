@@ -119,6 +119,7 @@ Window {
         x:window.x
         y:window.y
         function show(){
+            opacity_text_window.visible=false
             visible=true
             scale_text_timer.running=false
             scale_text_timer.running=true
@@ -131,6 +132,30 @@ Window {
             id:scale_text_timer
             interval: 2000
             onTriggered: scale_text_window.visible=false
+        }
+    }
+    Window{
+        id:opacity_text_window
+        visible: false
+        flags: Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
+        width: opacity_text.width
+        height: opacity_text.height
+        x:window.x
+        y:window.y
+        function show(){
+            scale_text_window.visible=false
+            visible=true
+            opacity_text_timer.running=false
+            opacity_text_timer.running=true
+        }
+        Text{
+            id:opacity_text
+            text: "透明度:"+parseInt(window.opacity*100)+"%"
+        }
+        Timer{
+            id:opacity_text_timer
+            interval: 2000
+            onTriggered: opacity_text_window.visible=false
         }
     }
 
@@ -153,14 +178,33 @@ Window {
         onWheel:(wheel)=>{
                     if(!lock)
                     {
-                        if(wheel.angleDelta.y>0) win.scale+=0.05
-                        else if(wheel.angleDelta.y<0)
-                        {
-                            if(window.width>100)  win.scale-=0.05
-                            else win.scale=50/width_
+                        if($press_ctrl){
+                            if(wheel.angleDelta.y>0)
+                            {
+                                if(window.opacity<=0.95)
+                                window.opacity+=0.05
+                                else
+                                window.opacity=1
+                            }
+                            else if(wheel.angleDelta.y<0)
+                            {
+                                if(window.opacity>=0.1)
+                                window.opacity-=0.05
+                                else
+                                window.opacity=0.01
+                            }
+                            opacity_text_window.show()
                         }
-                        resize()
-                        scale_text_window.show()
+                        else{
+                            if(wheel.angleDelta.y>0) win.scale+=0.05
+                            else if(wheel.angleDelta.y<0)
+                            {
+                                if(window.width>100)  win.scale-=0.05
+                                else win.scale=50/width_
+                            }
+                            resize()
+                            scale_text_window.show()
+                        }
                     }
                 }
         onPressed: (mouse)=>{

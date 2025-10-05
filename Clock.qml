@@ -202,11 +202,26 @@ Window{
         onWheel:(wheel)=>{
                     if(!lock)
                     {
-                        if(wheel.angleDelta.y>0) win.scale+=0.1
-                        else if(wheel.angleDelta.y<0)
-                        {
-                            if(win.scale>0.2)  win.scale-=0.1
+                        if($press_ctrl){
+                            if(wheel.angleDelta.y>0)
+                            {
+                                if(window_opacity.value<=95)
+                                    window_opacity.setValue(window_opacity.value+5)
+                            }
+                            else if(wheel.angleDelta.y<0)
+                            {
+                                if(window_opacity.value>=10)
+                                    window_opacity.setValue(window_opacity.value-5)
+                            }
                         }
+                        else{
+                            if(wheel.angleDelta.y>0) win.scale+=0.1
+                            else if(wheel.angleDelta.y<0)
+                            {
+                                if(win.scale>0.2)  win.scale-=0.1
+                            }
+                        }
+
                     }
                 }
         onPressed: (event)=>{

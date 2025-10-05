@@ -10,6 +10,7 @@
 #include "eventsender.h"
 #include "gfile.h"
 
+
 // 清除指定目录下所有文件的函数
 void clearRelativeDirContents(const QString &relativePath)
 {
@@ -138,16 +139,13 @@ int main(int argc, char *argv[])
 
         // 尝试通过objectName查找EventSender实例
         QObject *eventSender = rootObject->findChild<QObject*>("eventSender");
-
         // 如果没找到，尝试搜索所有对象
         if (!eventSender) {
             auto allObjects = rootObject->findChildren<QObject*>();
             for (auto obj : std::as_const(allObjects)) {
                 if (obj->inherits("EventSender")) {
                     eventSender = obj;
-                    qDebug() << "Found EventSender";
                     break;
-
                 }
             }
         }
@@ -201,6 +199,21 @@ int main(int argc, char *argv[])
             if (!hotkey_shot->isRegistered()||!hotkey_paster->isRegistered()||!hotkey_time->isRegistered()) {
                 QMessageBox::warning(nullptr, "错误", "注册全局快捷键出错\n部分或全部快捷键将无法使用");
             }
+
+            QTimer* timer = new QTimer;
+            QObject::connect(timer, &QTimer::timeout, [eventSender](){
+                static bool lastState = false;
+                bool currentState = (GetAsyncKeyState(VK_LCONTROL) & 0x8000) ||
+                                    (GetAsyncKeyState(VK_RCONTROL) & 0x8000);
+                if (currentState != lastState) {
+                    if (currentState) {
+                        QMetaObject::invokeMethod(eventSender, "send", Q_ARG(QVariant, -1));
+                    } else {
+                        QMetaObject::invokeMethod(eventSender, "send", Q_ARG(QVariant, -2));
+                    }
+                    lastState = currentState;
+                }});
+            timer->start(100);
         }
         else
             QMessageBox::critical(nullptr, "错误", "无法找到EventSender\n全局快捷键将无法使用");

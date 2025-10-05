@@ -257,7 +257,7 @@ GWindow{
                         s="./value_clock.txt"
                         break
                     case 5:
-                        s="./data.ini"
+                        s="./data.json"
                         break
                     case 6:
                         s="./source"

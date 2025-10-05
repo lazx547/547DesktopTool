@@ -62,6 +62,26 @@ Window{
                     menu_.items[i].text=name
             }
         }
+        function add_(s_){
+            var menuItem = Qt.createQmlObject(`
+                                              import Qt.labs.platform
+                                              MenuItem {
+                                                property string n
+                                                onTriggered: pasterLoad.newP("./file/saves/"+n+".json")
+                                              }
+                                              `, menu)
+            menuItem.n=s_
+            menuItem.text=s_
+            menu_paster.insertItem(menu_paster.items.length, menuItem)
+        }
+        function del_(name){
+            for(var i=0;i<menu_paster.items.length;i++)
+                if(menu_paster.items[i].n==name)
+                {
+                    menu_paster.items[i].destroy()
+                    menu_paster.removeItem(menu_paster.items[i])
+                }
+        }
     }
     property Item clock_:Item{
         function add(s_){
@@ -185,6 +205,10 @@ Window{
                 icon.source:"qrc:/images/paster.png"
                 title:"547Paster("+items.length+")"
                 id:menu_
+            }
+            Platform.Menu{
+                id:menu_paster
+                title: "存档"
             }
             Platform.MenuItem{
                 text: "全部显示"

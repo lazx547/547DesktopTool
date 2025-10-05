@@ -13,16 +13,19 @@ Item {
     function read(){
         file.source="./"
     }
+    Paster{
+
+    }
 
     function create(){
         if(!Clipboard.isEmpty()){
-            console.log("ts:"+Clipboard.showType())
             objs.push(imagePaster.createObject())
             var n=objs.length-1
             objs[n].thisn=n
             objs[n].path="-1"
             var s=String(objs[n])
             objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
+
         }
         else console.log("clip empty")
     }
@@ -40,8 +43,8 @@ Item {
     function newP(p){
         objs.push(paster.createObject())
         var n=objs.length-1
-        objs[n].thisn=n
         objs[n].path=p
+        objs[n].thisn=n
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
         sysTray.paster.add(objs[n],n)
@@ -56,8 +59,8 @@ Item {
         console.log("toText")
         objs.push(paster.createObject())
         n=objs.length-1
+        objs[n].path="./data.json"
         objs[n].thisn=n
-        objs[n].path="-1"
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
         sysTray.paster.add(objs[n],n)

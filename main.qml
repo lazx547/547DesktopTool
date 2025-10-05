@@ -13,9 +13,10 @@ Window{
     y:-1
     property var $menu
     property color $topic_color:"#2080f0"
+    property bool $press_ctrl:false
     Item{
         id:app
-        property GFile file:GFile{}
+        property GFile file:GFile{ id:_file}
         SysTray{ id:sysTray }
         Clock{ id:clock }
         Rand_bar{ id:rand_bar }
@@ -38,9 +39,27 @@ Window{
                                case 2:
                                setting.copyTime()
                                break
+                               case -1:
+                               $press_ctrl=true
+                               break
+                               case -2:
+                               $press_ctrl=false
+                               break
                                default:
                                console.log("unkown mesenge from C++")
                            }
                        }
+    }
+
+    Component.onCompleted: {
+        _file.source="./file/saves/.num"
+        var s=_file.read()
+        var a=Number(s.slice(0,s.indexOf(","))),im
+        var Csaves=Qt.createComponent("./CSaveItem.qml")
+        for(var n=1;n<=a;n++){
+            s=s.slice(s.indexOf(",")+1,s.length)
+            im=s.slice(0,s.indexOf(","))
+            sysTray.paster.add_(im)
+        }
     }
 }

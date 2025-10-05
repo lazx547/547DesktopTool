@@ -3,15 +3,14 @@
 
 #include <QObject>
 #include <QVariant>
+#include <windows.h>
+#include <QTimer>
 
 class EventSender : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariant data READ data NOTIFY dataChanged)
 public:
-    explicit EventSender (QObject *parent = nullptr){
-
-    }
     QVariant data() const { return m_data; }
     // 直接发射信号的函数
     Q_INVOKABLE void send(const QVariant &_data)
@@ -24,5 +23,4 @@ public:
 signals:
     void dataChanged(const QVariant &data);
 };
-
 #endif // EVENTSENDER_H
