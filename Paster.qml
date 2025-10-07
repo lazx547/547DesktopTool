@@ -36,6 +36,7 @@ Window{
     property color color_text:Qt.rgba(0,0,0,1)
     property color color_back:Qt.rgba(1,1,1,0.2)
     property color color_border:Qt.rgba(0,0,0,1)
+    property bool named:false
     property int border_width:4
     property bool text_center:false
     property font text_font:{
@@ -67,6 +68,10 @@ Window{
             lastScaleH=win.scale
         else
             win.height=window.height/win.scale
+    }
+
+    onNameChanged: {
+        console.log("changed")
     }
 
     GFile{
@@ -117,8 +122,16 @@ Window{
                 if(s!="./data.json")
                 {
                     text_.text=text__.text=data.text
-                    width=data.window.width
-                    height=data.window.height
+                    width=data.window.width || width
+                    height=data.window.height || height
+                    x=data.window.x || (window.screen.width-width)/2
+                    y=data.window.y || (window.screen.height-height)/2
+                    if(data.name.is){
+                        named=true
+                        name=data.name.name
+                        console.log(data.name.name)
+                        sysTray.paster.rename(thisn,name)
+                    }
                 }
             }
             else
@@ -163,7 +176,9 @@ Window{
                 "window": {
                     "opacity": opacity,
                     "width":width,
-                    "height":height
+                    "height":height,
+                    "x":x,
+                    "y":y
                 },
                 "color": {
                     "font": {
@@ -191,7 +206,11 @@ Window{
                     "center": font_center.checked,
                     "family":text_font.family
                 },
-                "text":text_.text
+                "text":text_.text,
+                "name":{
+                    "is":named,
+                    "name":name
+                }
             }
             var jsonString = JSON.stringify(settingsData, null, 4)
             file.source=s
@@ -596,7 +615,7 @@ Window{
                     }
 
                     onAccepted: {
-                        menu_.visible=false
+                        menu.visible=false
                         pasterLoad.rename(thisn,textInput.text)
                         name=textInput.text
                         textInput.text = ""

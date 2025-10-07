@@ -43,10 +43,10 @@ Item {
     function newP(p){
         objs.push(paster.createObject())
         var n=objs.length-1
-        objs[n].path=p
-        objs[n].thisn=n
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
+        objs[n].path=p
+        objs[n].thisn=n
         sysTray.paster.add(objs[n],n)
     }
 
@@ -59,21 +59,21 @@ Item {
         console.log("toText")
         objs.push(paster.createObject())
         n=objs.length-1
-        objs[n].path="./data.json"
-        objs[n].thisn=n
         var s=String(objs[n])
         objs[n].name=s.slice(s.indexOf("(")+1,s.length-1)
+        objs[n].path="./data.json"
+        objs[n].thisn=n
         sysTray.paster.add(objs[n],n)
     }
 
     function setV(n){
-        sysTray.paster.sv(objs[n])
+        sysTray.paster.sv(n)
     }
 
     function exit(n)
     {
         try{
-            sysTray.paster.del(objs[n])
+            sysTray.paster.del(n)
         }
         catch(i){
         }
