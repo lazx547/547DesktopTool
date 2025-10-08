@@ -27,7 +27,7 @@ GWindow{
             x:90
             y:35
             font.pixelSize: 20
-            text:"547DesktopTool v0.7"
+            text:"547DesktopTool v0.8"
         }
         Image {
             x:20

@@ -592,7 +592,6 @@ Window{
                     anchors.centerIn: parent
                     modal: true
                     standardButtons: Dialog.Ok | Dialog.Cancel
-
                     ColumnLayout {
                         anchors.fill: parent
                         spacing: 0
