@@ -463,7 +463,7 @@ Window{
         id:menu
         visible:false
         width: 112
-        height: 302
+        height: 282
         color:"#00000000"
         minimumWidth: 112
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
@@ -577,7 +577,7 @@ Window{
                     metrics.text=Clipboard.pasteText()
                     menu.visible=false
                 }
-            }
+            }/*
             Cbutton{
                 y:20*6
                 type:1
@@ -624,9 +624,9 @@ Window{
                         textInput.text = ""
                     }
                 }
-            }
+            }*/
             Cbutton{
-                y:20*7
+                y:20*6
                 type:1
                 width: parent.width
                 text:"自动调整大小"
@@ -637,7 +637,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*8
+                y:20*7
                 type:1
                 width: parent.width
                 text:"保存为"
@@ -658,7 +658,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*9
+                y:20*8
                 type:1
                 width: parent.width
                 text:"转换为图片"
@@ -670,7 +670,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*10
+                y:20*9
                 type:1
                 width: parent.width
                 text:"保存为图片"
@@ -683,7 +683,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*11
+                y:20*10
                 type:1
                 width: parent.width
                 text: "隐藏"
@@ -693,7 +693,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*12
+                y:20*11
                 type:1
                 width: parent.width
                 text: "幽灵模式"
@@ -703,7 +703,7 @@ Window{
                 }
             }
             Cbutton{
-                y:20*13
+                y:20*12
                 type:1
                 width: parent.width
                 text: "关闭"

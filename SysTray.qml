@@ -17,7 +17,6 @@ Window{
                                               import Qt.labs.platform
                                               MenuItem {
                                                 property var s
-                                                property string thisn
                                                 checked:true
                                                 checkable:true
                                                 onCheckedChanged: {
@@ -32,15 +31,22 @@ Window{
                                               `, menu)
             menuItem.s=s_
             var s=String(s_)
-            menuItem.thisn=n
             s=s.slice(s.indexOf("("),s.length)
             menuItem.text=s
             menu_.insertItem(0, menuItem)
 
         }
+        function delA(){
+            for(var i=0;i<menu_.items.length;i++)
+            {
+                menu_.items[i].destroy()
+                menu_.removeItem(menu_.items[i])
+            }
+        }
+
         function del(n){
             for(var i=0;i<menu_.items.length;i++)
-                if(menu_.items[i].thisn==n)
+                if(menu_.items[i].s.thisn==n)
                 {
                     menu_.items[i].destroy()
                     menu_.removeItem(menu_.items[i])
@@ -49,7 +55,7 @@ Window{
         }
         function sv(n){
             for(var i=0;i<menu_.items.length;i++)
-                if(menu_.items[i].thisn==n)
+                if(menu_.items[i].s.thisn==n)
                 {
                     menu_.items[i].checked=!menu_.items[i].checked
                 }
@@ -58,7 +64,7 @@ Window{
         {
             for(var i=0;i<menu_.items.length;i++)
             {
-                if(menu_.items[i].thisn==n)
+                if(menu_.items[i].s.thisn==n)
                     menu_.items[i].text=name
             }
         }
