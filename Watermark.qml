@@ -6,8 +6,8 @@ Window{
     color: "#00000000"
     id:root
     visible:false
-    x:root.screen.width*0.805
-    y:root.screen.height*0.85
+    x:(root.screen.width-root.width)*0.85+root.width/2
+    y:(root.screen.height-root.height)*0.87+root.height/2
     width:text_.width
     height: text.height+text_.height
     opacity: 0.5
