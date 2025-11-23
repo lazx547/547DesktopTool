@@ -5,7 +5,10 @@
 #include <QDir>
 #include <QUrl>
 #include <QProcess>
+#include <QApplication>
 #include <QDesktopServices>
+#include <QSharedMemory>
+#include <QTimer>
 
 class GFile : public QObject
 {
@@ -39,6 +42,20 @@ public:
         qDebug()<<fileInfo.absoluteFilePath();
         QString param = "/select," + QDir::toNativeSeparators(fileInfo.absoluteFilePath());
         QProcess::startDetached("explorer.exe", QStringList(param));
+    }
+    Q_INVOKABLE void restartApplication() {
+        QString sharedMemoryKey = "547DesktopTool";
+        QSharedMemory sharedMemory(sharedMemoryKey);
+
+        // 分离当前进程与共享内存的关联
+        if (sharedMemory.isAttached()) {
+            sharedMemory.detach();
+        }
+        QTimer::singleShot(1000, []() {
+            QProcess::startDetached(QCoreApplication::applicationFilePath(),
+                                    QCoreApplication::arguments());
+            QCoreApplication::quit();
+        });
     }
     QString m_source;
 

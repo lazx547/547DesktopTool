@@ -269,7 +269,16 @@ Window{
                     setting.save()
                     clock.save()
                 }
-            }
+            }/*
+            Platform.MenuItem{
+                text: "重启"
+                onTriggered:
+                {
+                    setting.save()
+                    clock.save()
+                    _file.restartApplication()
+                }
+            }*/
             Platform.MenuItem{
                 text: "退出"
                 onTriggered:

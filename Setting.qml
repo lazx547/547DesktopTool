@@ -53,7 +53,8 @@ GWindow{
         file.write(a)
         file.source="./hotkey.ini"
         var s=file.write(String((hotkey_shot.text===""?hotkey_shot.placeholderText:hotkey_shot.text)+","
-                                  +(hotkey_paster.text===""?hotkey_paster.placeholderText:hotkey_paster.text)+","))
+                                  +(hotkey_paster.text===""?hotkey_paster.placeholderText:hotkey_paster.text)+",")
+                         +(hotkey_time.text===""?hotkey_time.placeholderText:hotkey_time.text)+",")
     }
     function read(){
         file.source="./setting.ini"
@@ -226,7 +227,7 @@ GWindow{
                 width: 200
                 onCurrentValueChanged:
                     file_open.enabled=currentIndex<=5
-                model: ["全局快捷键配置文件","程序缩放配置文件","设置配置文件","547抽号器（边栏）名单配置","547clock个性化配置","547paster个性化配置","547抽号器班级名单目录","547clock存档目录","547paster存档目录"
+                model: ["全局快捷键配置文件","程序缩放配置文件","设置配置文件","547抽号器（边栏）名单配置","547clock个性化配置","547paster个性化配置","547抽号器班级名单目录","547clock存档目录","547paster存档目录","图片临时文件夹"
                 ]
                 function getValue(){
                     var s
@@ -258,6 +259,8 @@ GWindow{
                     case 8:
                         s="./file/saves"
                         break
+                    case 9:
+                        s="./file/temp"
                     }
                     return s;
                 }
