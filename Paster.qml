@@ -114,10 +114,11 @@ Window{
                 }
                 // 字体设置
                 if (data.font) {
-                    font_size.value = data.font.size || 30
+                    font_size.setValue( data.font.size || 30)
                     font_bord.checked = data.font.bord !== undefined ? data.font.bord : false
                     font_center.checked = data.font.center !== undefined ? data.font.center : false
                     font_combo.currentIndex=font_combo.model.indexOf(data.font.family || font_.family)
+                    text_font.family=data.font.family || font_.family
                 }
                 if(s!="./data.json")
                 {

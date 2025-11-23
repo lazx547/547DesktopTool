@@ -272,7 +272,13 @@ Window{
             }
             Platform.MenuItem{
                 text: "退出"
-                onTriggered: Qt.quit()
+                onTriggered:
+                {
+
+                    clock.save()
+                    setting.save()
+                    Qt.quit()
+                }
                 icon.source:"qrc:/images/exit.png"
             }
         }

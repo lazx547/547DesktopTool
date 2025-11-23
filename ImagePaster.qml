@@ -109,6 +109,8 @@ Window {
             win.scale=height/height_
             resize()
         }
+        image.width=window.width
+        image.height=window.height
     }
     Window{
         id:scale_text_window
@@ -254,38 +256,39 @@ Window {
         scale: 1
         width: width_
         height: height_
-        Image{
-            property string last:"-1"
-            id:image
-            onSourceChanged: console.log("sc")
-            onStatusChanged:
+    }
+    Image{
+        property string last:"-1"
+        id:image
+        fillMode: Image.Stretch
+        onSourceChanged: console.log("sc")
+        onStatusChanged:
+        {
+            if(status==Image.Error)
             {
-                if(status==Image.Error)
-                {
-                    console.log("IP:error")
-                    if(last=="-1")
-                        pasterLoad.toText(thisn)
-                    else
-                        source=last
-                }
-                else if(status==Image.Ready)
-                {
-                    image.width=sourceSize.width*win.scale
-                    image.height=image.width*sourceSize.height/sourceSize.width
-                    console.log("IP:ok")
-                    width/=dpr
-                    height/=dpr
-                    width_=image.width
-                    height_=image.height
-                    resize()
-                    pasterLoad.addMenu(thisn)
-                }
-                else if(status==Image.Loading)
-                    console.log("IP:ing")
-                else if(status==Image.Null)
+                console.log("IP:error")
+                if(last=="-1")
+                    pasterLoad.toText(thisn)
+                else
                     source=last
-                else console.log(status)
             }
+            else if(status==Image.Ready)
+            {
+                image.width=sourceSize.width*win.scale
+                image.height=image.width*sourceSize.height/sourceSize.width
+                console.log("IP:ok")
+                width/=dpr
+                height/=dpr
+                width_=image.width
+                height_=image.height
+                resize()
+                pasterLoad.addMenu(thisn)
+            }
+            else if(status==Image.Loading)
+                console.log("IP:ing")
+            else if(status==Image.Null)
+                source=last
+            else console.log(status)
         }
     }
     Window{//右键菜单窗口

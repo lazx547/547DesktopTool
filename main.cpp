@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     file.setSource("./scale.txt");
 
     // 如果文件不存在就创建
-    if(file.is(file.source()))
+    if(!file.is(file.source()))
         file.write("1");
     QString s=file.read();
 

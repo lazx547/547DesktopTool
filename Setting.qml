@@ -51,6 +51,9 @@ GWindow{
         a=topic_color_picker.r+","+topic_color_picker.g+","+topic_color_picker.b+","+topic_color_picker.a+","
         a+=auto_save.checked+","+clock.ghost+","+rand_bar.visible+","+colorful_shot.checked+","+time_copy.text+","+watermark.type+","+watermark.visible+","
         file.write(a)
+        file.source="./hotkey.ini"
+        var s=file.write(String((hotkey_shot.text===""?hotkey_shot.placeholderText:hotkey_shot.text)+","
+                                  +(hotkey_paster.text===""?hotkey_paster.placeholderText:hotkey_paster.text)+","))
     }
     function read(){
         file.source="./setting.ini"
@@ -204,19 +207,6 @@ GWindow{
                     anchors.fill: parent
                     border.width: 1
                     border.color: "#80808080"
-                }
-            }
-            Cbutton{
-                y:120
-                x:80
-                width: 120
-                height: 20
-                text: "保存（重启生效）"
-                onClicked:
-                {
-                    file.source="./hotkey.ini"
-                    var s=file.write(String((hotkey_shot.text===""?hotkey_shot.placeholderText:hotkey_shot.text)+","
-                                              +(hotkey_paster.text===""?hotkey_paster.placeholderText:hotkey_paster.text)+","))
                 }
             }
         }
